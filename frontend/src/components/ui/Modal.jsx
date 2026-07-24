@@ -21,7 +21,7 @@ export default function Modal({ isOpen, onClose, title, children, contentClassNa
       <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
       {/* Content Container */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
         
         {/* Mobile Handle Bar */}
         <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-1 sm:hidden" />
