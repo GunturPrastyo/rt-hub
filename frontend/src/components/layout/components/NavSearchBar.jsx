@@ -78,8 +78,8 @@ export default function NavSearchBar() {
   };
 
   return (
-    <div className="relative hidden md:block md:w-64 lg:w-96">
-      <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+    <div className="relative w-full max-w-full">
+      <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
       <input
         type="text"
         value={searchQuery}
@@ -87,11 +87,11 @@ export default function NavSearchBar() {
         onFocus={handleSearch}
         onKeyDown={handleKeyDown}
         placeholder="Cari menu atau fitur RT..."
-        className="w-full pl-11 pr-4 py-2 rounded-lg border-transparent bg-gray-100 dark:bg-slate-700/50 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:border-transparent focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all"
+        className="w-full pl-11 pr-4 py-2 rounded-lg border-transparent bg-slate-100 dark:bg-slate-700/50 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:border-transparent focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-slate-400/20 focus:outline-none transition-all"
       />
 
       {isSearchOpen && searchQuery.trim() && (
-        <div className="absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-100 dark:border-slate-700 z-50 max-h-80 overflow-y-auto custom-scrollbar">
+        <div className="absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700 z-50 max-h-80 overflow-y-auto custom-scrollbar">
           {searchResults.length > 0 ? (
             <ul className="py-2">
               {searchResults.map((result, index) => {
@@ -102,18 +102,18 @@ export default function NavSearchBar() {
                     <button
                       onClick={() => navigateTo(result.link)}
                       className={`w-full text-left px-4 py-2.5 transition-colors ${
-                        isSelected ? 'bg-blue-50 dark:bg-slate-700' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                        isSelected ? 'bg-slate-100 dark:bg-slate-700' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? 'bg-blue-100 dark:bg-slate-600 text-blue-600 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500'}`}>
+                        <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${isSelected ? 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'}`}>
                           <IconComponent size={18} />
                         </div>
                         <div>
-                          <div className={`text-sm font-semibold ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200'}`}>
+                          <div className={`text-sm font-semibold ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-200'}`}>
                             {result.name}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{result.desc}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{result.desc}</div>
                         </div>
                       </div>
                     </button>
@@ -122,7 +122,7 @@ export default function NavSearchBar() {
               })}
             </ul>
           ) : (
-            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
+            <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
               Fitur tidak ditemukan.
             </div>
           )}
