@@ -1,39 +1,62 @@
-import { HiBars3, HiOutlineBell, HiOutlineUserCircle } from 'react-icons/hi2';
+import { useState, useEffect } from 'react';
+import { HiBars3, HiSun, HiMoon } from 'react-icons/hi2';
+
+import NavSearchBar from './components/NavSearchBar';
+import NavNotification from './components/NavNotification';
+import NavUserProfile from './components/NavUserProfile';
 
 export default function Navbar({ onToggleSidebar }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (
+      localStorage.getItem('color-theme') === 'dark' ||
+      (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('color-theme', 'light');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('color-theme', 'dark');
+      setIsDarkMode(true);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-gray-100 bg-white/80 px-6 backdrop-blur-md dark:border-slate-700 dark:bg-slate-800/80">
-      {/* Tombol Toggle Sidebar (Muncul di Mobile) */}
-      <div className="flex items-center gap-4">
+    <header className="flex items-center justify-between h-20 px-6 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 shadow-sm sticky top-0 z-10">
+      {/* Sisi Kiri: Button Toggle Sidebar & Search Bar */}
+      <div className="flex items-center">
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700 lg:hidden"
+          className="text-gray-600 dark:text-gray-300 focus:outline-none mr-4 lg:hidden"
           aria-label="Toggle Sidebar"
         >
           <HiBars3 size={24} />
         </button>
-        <div className="hidden sm:block">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Selamat Datang, Pak RT 👋
-          </h2>
-          <p className="text-xs text-gray-400">Sistem Pengelolaan Administrasi Perumahan</p>
-        </div>
+
+        <NavSearchBar />
       </div>
 
-      {/* Profil Ringkas */}
+      {/* Sisi Kanan: Theme Toggle, Notifications, User Profile */}
       <div className="flex items-center gap-4">
-        <button className="relative rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700">
-          <HiOutlineBell size={22} />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+          title="Ganti Tema"
+        >
+          {isDarkMode ? <HiSun size={20} /> : <HiMoon size={20} />}
         </button>
-        <div className="h-8 w-px bg-gray-200 dark:bg-slate-700"></div>
-        <div className="flex items-center gap-3">
-          <HiOutlineUserCircle size={36} className="text-gray-400 dark:text-gray-500" />
-          <div className="hidden md:block">
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Admin RT 01</p>
-            <p className="text-xs text-gray-400">Ketua RT</p>
-          </div>
-        </div>
+
+        <NavNotification />
+        <NavUserProfile />
       </div>
     </header>
   );
