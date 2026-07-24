@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/* Definisi Theme Font Tailwind v4 */
+@theme {
+  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Oswald', system-ui, -apple-system, sans-serif;
+}
+
+/* Variant Dark Mode */
 @variant dark (&:where(.dark, .dark *));
+
+/* Font Body Default (Poppins otomatis diterapkan ke seluruh aplikasi) */
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
 
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
