@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { HiXMark } from 'react-icons/hi2';
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, contentClassName = '' }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -20,9 +20,10 @@ export default function Modal({ isOpen, onClose, title, children }) {
       {/* Backdrop */}
       <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 overflow-hidden transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
+      {/* Content Container */}
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
         
-        {/* Handle Bar Khusus Mobile (< sm) */}
+        {/* Mobile Handle Bar */}
         <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
         {/* Header */}
@@ -36,8 +37,10 @@ export default function Modal({ isOpen, onClose, title, children }) {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">{children}</div>
+        {/* Body (Diizinkan Overflow-visible untuk Desktop Popover) */}
+        <div className={`p-6 ${contentClassName}`}>
+          {children}
+        </div>
       </div>
     </div>
   );
