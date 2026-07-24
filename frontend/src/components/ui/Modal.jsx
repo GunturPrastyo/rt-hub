@@ -16,14 +16,14 @@ export default function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
-      {/* Content Container */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl lg:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 overflow-hidden transform transition-all animate-in slide-in-from-bottom lg:animate-in lg:fade-in-50 lg:zoom-in-95">
-        {/* Mobile Handle Bar */}
-        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-1 lg:hidden" />
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 overflow-hidden transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
+        
+        {/* Handle Bar Khusus Mobile (< sm) */}
+        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-1 sm:hidden" />
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700/80">
