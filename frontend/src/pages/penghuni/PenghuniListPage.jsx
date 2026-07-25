@@ -124,111 +124,114 @@ export default function PenghuniListPage() {
         </Button>
       </PageHeader>
 
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-        <div className="w-full sm:w-72">
-          <Input
-            icon={HiMagnifyingGlass}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari nama / nomor WA..."
-          />
+      {/* Main Content Card */}
+      <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+        {/* Filter Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-slate-100 dark:border-slate-700/80">
+          <div className="w-full sm:w-72">
+            <Input
+              icon={HiMagnifyingGlass}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari nama / nomor WA..."
+            />
+          </div>
+
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-lg shrink-0">
+            {['Semua', 'Tetap', 'Kontrak'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setStatusFilter(tab)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  statusFilter === tab
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-lg shrink-0">
-          {['Semua', 'Tetap', 'Kontrak'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
-                statusFilter === tab
-                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        {/* Grid Cards (3 Kolom Desktop) */}
+        {filteredPenghuni.length > 0 ? (
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredPenghuni.map((warga) => (
+              <div
+                key={warga.id}
+                className="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex flex-col justify-between"
+              >
+                <div>
+                  {/* Header Card */}
+                  <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
+                    <div className="min-w-0">
+                      <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 truncate">
+                        {warga.nama}
+                      </h3>
+                      <span className="text-[11px] text-slate-400 block mt-0.5">
+                        Rumah: <span className="font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">{warga.rumahSaatIni}</span>
+                      </span>
+                    </div>
+
+                    <Badge variant={warga.statusWarga === 'Tetap' ? 'success' : 'warning'} className="shrink-0">
+                      {warga.statusWarga}
+                    </Badge>
+                  </div>
+
+                  {/* Body Card Details */}
+                  <div className="py-4 space-y-2.5 text-xs">
+                    <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
+                      <HiOutlinePhone className="w-4 h-4 text-slate-600 shrink-0" />
+                      <span>{warga.telepon}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
+                      <HiOutlineHeart className="w-4 h-4 text-slate-600 shrink-0" />
+                      <span>Status: <strong className="font-semibold">{warga.statusPernikahan}</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Actions */}
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                  
+                  {/* Tombol Lihat KTP */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveKtp({ url: warga.fotoKtp, nama: warga.nama })}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors cursor-pointer"
+                  >
+                    <HiOutlineEye size={16} />
+                    <span>Lihat KTP</span>
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleOpenEditModal(warga)}
+                      className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                      title="Edit Warga"
+                    >
+                      <HiOutlinePencilSquare size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(warga.id)}
+                      className="p-1.5 rounded-md text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                      title="Hapus Warga"
+                    >
+                      <HiOutlineTrash size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <p className="text-sm text-slate-400">Tidak ada data penghuni yang sesuai.</p>
+          </div>
+        )}
       </div>
-
-      {/* Grid Cards (3 Kolom Desktop) */}
-      {filteredPenghuni.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredPenghuni.map((warga) => (
-            <div
-              key={warga.id}
-              className="p-5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex flex-col justify-between"
-            >
-              <div>
-                {/* Header Card */}
-                <div className="flex items-start justify-between pb-3 border-b border-slate-100 dark:border-slate-700/60">
-                  <div>
-                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                      {warga.nama}
-                    </h3>
-                    <span className="text-[11px] text-slate-400 block mt-0.5">
-                      Rumah: <span className="font-semibold text-slate-600 dark:text-slate-300">{warga.rumahSaatIni}</span>
-                    </span>
-                  </div>
-
-                  <Badge variant={warga.statusWarga === 'Tetap' ? 'success' : 'warning'}>
-                    {warga.statusWarga}
-                  </Badge>
-                </div>
-
-                {/* Body Card Details */}
-                <div className="py-4 space-y-2.5 text-xs">
-                  <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
-                    <HiOutlinePhone className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>{warga.telepon}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
-                    <HiOutlineHeart className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>Status: <strong className="font-semibold">{warga.statusPernikahan}</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Actions */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                
-                {/* Tombol Lihat KTP */}
-                <button
-                  type="button"
-                  onClick={() => setActiveKtp({ url: warga.fotoKtp, nama: warga.nama })}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors cursor-pointer"
-                >
-                  <HiOutlineEye size={16} />
-                  <span>Lihat KTP</span>
-                </button>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleOpenEditModal(warga)}
-                    className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                    title="Edit Warga"
-                  >
-                    <HiOutlinePencilSquare size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(warga.id)}
-                    className="p-1.5 rounded-md text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-                    title="Hapus Warga"
-                  >
-                    <HiOutlineTrash size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-          <p className="text-sm text-slate-400">Tidak ada data penghuni yang sesuai.</p>
-        </div>
-      )}
 
       {/* Modal Form Tambah/Edit */}
       <PenghuniFormModal
