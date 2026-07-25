@@ -45,14 +45,14 @@ export default function Sidebar({ isOpen, onClose }) {
       name: 'Transaksi',
       icon: HiOutlineCreditCard,
       children: [
-        { name: 'Pemasukan Iuran', link: '/transaksi/iuran', icon: HiOutlineReceiptPercent },
+        { name: 'Pemasukan Iuran', link: '/transaksi/pemasukan', icon: HiOutlineReceiptPercent },
         { name: 'Pengeluaran RT', link: '/transaksi/pengeluaran', icon: HiOutlineArrowTrendingDown },
       ],
     },
     { 
       name: 'Laporan Finansial', 
       icon: HiOutlineChartBar, 
-      link: '/laporan' 
+      link: '/laporan/finansial' 
     },
   ];
 
