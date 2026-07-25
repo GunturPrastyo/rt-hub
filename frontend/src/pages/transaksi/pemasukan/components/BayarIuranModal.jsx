@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import Modal from '../../../../components/ui/Modal';
 import Button from '../../../../components/ui/Button';
 import Input from '../../../../components/ui/Input';
-import { HiMagnifyingGlass, HiChevronDown } from 'react-icons/hi2';
+import Badge from '../../../../components/ui/Badge';
+import { 
+  HiMagnifyingGlass, 
+  HiChevronDown,
+  HiOutlineUserCircle,
+  HiOutlineHome,
+  HiOutlineIdentification
+} from 'react-icons/hi2';
 
 export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePenghuni = [], selectedBulan }) {
   const TARIF_KEBERSIHAN = 35000;
@@ -105,13 +112,15 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
       title="Catat Pembayaran Iuran Warga"
       contentClassName="overflow-y-auto max-h-[85vh] custom-scrollbar sm:max-w-4xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Searchable Warga Dropdown */}
-        <div className="relative" ref={searchRef}>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
-            Pilih Warga / Penghuni
-          </label>
-          <div className="relative">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 p-1">
+          {/* Left Column: Warga Selection & Info */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="relative" ref={searchRef}>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+                Pilih Warga / Penghuni
+              </label>
+              <div className="relative">
             <Input
               icon={HiMagnifyingGlass}
               value={wargaSearchQuery}
@@ -124,13 +133,13 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
               placeholder="Cari nama atau nomor rumah..."
               required
             />
-            <button type="button" onClick={() => setIsWargaDropdownOpen(!isWargaDropdownOpen)} className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <HiChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-          </div>
+                <button type="button" onClick={() => setIsWargaDropdownOpen(!isWargaDropdownOpen)} className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <HiChevronDown className="h-5 w-5 text-gray-400" />
+                </button>
+              </div>
 
-          {isWargaDropdownOpen && (
-            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-600 max-h-60 overflow-auto">
+              {isWargaDropdownOpen && (
+            <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-600 max-h-60 overflow-auto">
               <ul className="py-1">
                 {filteredAvailablePenghuni.length > 0 ? filteredAvailablePenghuni.map((w) => (
                   <li
@@ -148,13 +157,50 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                 )}
               </ul>
             </div>
-          )}
-        </div>
+              )}
+            </div>
 
-        {/* Payment Details - only show if a resident is selected */}
-        {selectedWarga && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Warga Info Card */}
+            {selectedWarga && (
+              <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-4 animate-fade-in">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm border-b border-slate-200 dark:border-slate-700 pb-2">
+                  Detail Penghuni
+                </h3>
+                <div className="space-y-3 text-xs">
+                  <div className="flex items-start gap-3">
+                    <HiOutlineUserCircle className="w-5 h-5 text-slate-400 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500">Nama Penghuni</p>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200">{selectedWarga.nama}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <HiOutlineHome className="w-5 h-5 text-slate-400 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500">Nomor Rumah</p>
+                      <p className="font-semibold text-slate-700 dark:text-slate-200">{selectedWarga.nomorRumah}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <HiOutlineIdentification className="w-5 h-5 text-slate-400 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500">Status Saat Ini</p>
+                      <div className="flex items-center gap-4 mt-1">
+                        <Badge variant={selectedWarga.isKebersihanLunas ? 'success' : 'danger'}>{selectedWarga.kebersihanStatus}</Badge>
+                        <Badge variant={selectedWarga.isSatpamLunas ? 'success' : 'danger'}>{selectedWarga.satpamStatus}</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Payment Details */}
+          <div className="lg:col-span-3">
+            {selectedWarga ? (
+              <div className="space-y-5 animate-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Iuran Kebersihan Card */}
               <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
                 <div className="flex items-center justify-between">
@@ -236,16 +282,23 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
               </div>
             </div>
 
-            {/* Total Bayar */}
-            <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
-              <div className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Total Pembayaran</div>
-              <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
-                Rp {grandTotal.toLocaleString('id-ID')}
+                {/* Total Bayar */}
+                <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
+                  <div className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Total Pembayaran</div>
+                  <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+                    Rp {grandTotal.toLocaleString('id-ID')}
+                  </div>
+                </div>
               </div>
-            </div>
-          </>
-        )}
-
+            ) : (
+              <div className="flex items-center justify-center h-full p-8 rounded-lg bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700">
+                <p className="text-sm text-slate-500 text-center">
+                  Pilih warga terlebih dahulu untuk melihat detail pembayaran.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
           <Button type="button" variant="ghost" onClick={onClose}>
