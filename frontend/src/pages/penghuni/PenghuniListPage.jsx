@@ -124,43 +124,6 @@ export default function PenghuniListPage() {
         </Button>
       </PageHeader>
 
-      {/* Ringkasan Statistik */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-            <HiOutlineUsers size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Total Penghuni</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">{penghuniList.length} Jiwa</div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <HiOutlineUserGroup size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Warga Tetap</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {penghuniList.filter((p) => p.statusWarga === 'Tetap').length} Orang
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3 col-span-2 sm:col-span-1">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <HiOutlineUserGroup size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Warga Kontrak</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {penghuniList.filter((p) => p.statusWarga === 'Kontrak').length} Orang
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
         <div className="w-full sm:w-72">

@@ -174,43 +174,6 @@ export default function RumahListPage() {
         </Button>
       </PageHeader>
 
-      {/* Quick Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-            <HiOutlineBuildingOffice2 size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Total Unit</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">{rumahList.length} Unit</div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <HiOutlineUserGroup size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Dihuni</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {rumahList.filter((r) => r.status === 'Dihuni').length} Rumah
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center gap-3 col-span-2 sm:col-span-1">
-          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <HiOutlineHome size={20} />
-          </div>
-          <div>
-            <div className="text-xs text-slate-400">Rumah Kosong</div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {rumahList.filter((r) => r.status === 'Kosong').length} Rumah
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
         <div className="w-full sm:w-72">
