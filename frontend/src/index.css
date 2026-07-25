@@ -2,8 +2,8 @@
 
 /* Definisi Theme Font Tailwind v4 */
 @theme {
-  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Oswald', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Variant Dark Mode */

@@ -6,11 +6,11 @@ import PenghuniListPage from '../pages/penghuni/PenghuniListPage';
 
 import PemasukanIuranPage from '../pages/transaksi/pemasukan/PemasukanIuranPage';
 import PengeluaranRtPage from '../pages/transaksi/pengeluaran/PengeluaranRtPage';
-import LaporanFinansialPage from '../pages/laporan/LaporanFinansialPage'; // File Laporan
+import LaporanFinansialPage from '../pages/laporan/LaporanFinansialPage'; 
 
 export default function AppRouter() {
   return (
-    <BrowserRouter> {/* 👈 Bungkus di sini */}
+    <BrowserRouter> 
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<DashboardPage />} />
