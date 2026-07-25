@@ -1,7 +1,21 @@
 import { useEffect } from 'react';
 import { HiXMark } from 'react-icons/hi2';
 
-export default function Modal({ isOpen, onClose, title, children, contentClassName = '' }) {
+export default function Modal({ isOpen, onClose, title, children, contentClassName = '', size = '4xl' }) {
+  const sizeVariants = {
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+  };
+  const modalSizeClass = sizeVariants[size] || sizeVariants['4xl'];
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -21,7 +35,7 @@ export default function Modal({ isOpen, onClose, title, children, contentClassNa
       <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
       {/* Content Container */}
-      <div className="relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95">
+      <div className={`relative w-full ${modalSizeClass} bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-lg shadow-xl border border-slate-200/80 dark:border-slate-700/80 z-10 transform transition-all animate-in slide-in-from-bottom sm:animate-in sm:fade-in-50 sm:zoom-in-95`}>
         
         {/* Mobile Handle Bar */}
         <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-1 sm:hidden" />

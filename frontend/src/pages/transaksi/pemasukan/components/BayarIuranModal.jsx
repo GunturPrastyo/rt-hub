@@ -110,7 +110,8 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
       isOpen={isOpen}
       onClose={onClose}
       title="Catat Pembayaran Iuran Warga"
-      contentClassName="overflow-y-auto max-h-[85vh] custom-scrollbar sm:max-w-4xl"
+      size="5xl"
+      contentClassName="overflow-y-auto sm:overflow-visible max-h-[85vh] sm:max-h-none custom-scrollbar"
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 p-1">
@@ -225,10 +226,10 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                   />
                   <Button
                     type="button"
-                    size="xs"
+                    size="md"
                     variant="secondary"
                     onClick={() => handleLunasAkhirTahun('kebersihan')}
-                    className="mt-2"
+                    className="mt-2 p-2"
                   >
                     Lunasi s/d Akhir Tahun
                   </Button>
@@ -265,10 +266,10 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                   />
                   <Button
                     type="button"
-                    size="xs"
+                    size="md"
                     variant="secondary"
                     onClick={() => handleLunasAkhirTahun('satpam')}
-                    className="mt-2"
+                    className="mt-2 p-2"
                   >
                     Lunasi s/d Akhir Tahun
                   </Button>
