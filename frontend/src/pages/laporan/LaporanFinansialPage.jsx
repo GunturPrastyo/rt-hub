@@ -6,6 +6,7 @@ import {
   HiOutlineFunnel
 } from 'react-icons/hi2';
 import Badge from '../../components/ui/Badge';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function LaporanFinansialPage() {
   const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
@@ -38,14 +39,11 @@ export default function LaporanFinansialPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-slate-100">
-          Laporan Finansial Kas RT
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Ringkasan arus kas, grafik tahunan, serta rekapitulasi mutasi bulanan.
-        </p>
-      </div>
+      <PageHeader
+        title="Laporan Finansial Kas RT"
+        description="Ringkasan arus kas, grafik tahunan, serta rekapitulasi mutasi bulanan."
+        titleSize="3xl"
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

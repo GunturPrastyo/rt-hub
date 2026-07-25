@@ -3,6 +3,7 @@ import { HiOutlinePlus, HiOutlineBanknotes, HiOutlineFunnel } from 'react-icons/
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
 import PengeluaranFormModal from './components/PengeluaranFormModal';
+import PageHeader from '../../../components/ui/PageHeader';
 
 export default function PengeluaranRtPage() {
   const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
@@ -45,21 +46,16 @@ export default function PengeluaranRtPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-slate-100">
-            Pengeluaran Operasional RT
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Pencatatan pengeluaran kas RT seperti gaji satpam, kebersihan, dan perbaikan fasilitas.
-          </p>
-        </div>
-
+      <PageHeader
+        title="Pengeluaran Operasional RT"
+        description="Pencatatan pengeluaran kas RT seperti gaji satpam, kebersihan, dan perbaikan fasilitas."
+        titleSize="2xl"
+      >
         <Button onClick={() => setIsModalOpen(true)} variant="primary">
           <HiOutlinePlus size={18} />
           <span>Catat Pengeluaran</span>
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Ringkasan Banner Pengeluaran */}
       <div className="p-5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">

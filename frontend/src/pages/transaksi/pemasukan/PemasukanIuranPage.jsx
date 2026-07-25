@@ -8,6 +8,7 @@ import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import BayarIuranModal from './components/BayarIuranModal';
+import PageHeader from '../../../components/ui/PageHeader';
 
 export default function PemasukanIuranPage() {
   const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
@@ -125,21 +126,16 @@ export default function PemasukanIuranPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-heading text-slate-800 dark:text-slate-100">
-            Pemasukan Iuran Warga
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Monitoring pembayaran iuran kebersihan (bisa tahunan) dan satpam (bulanan).
-          </p>
-        </div>
-
+      <PageHeader
+        title="Pemasukan Iuran Warga"
+        description="Monitoring pembayaran iuran kebersihan (bisa tahunan) dan satpam (bulanan)."
+        titleSize="3xl"
+      >
         <Button onClick={() => setIsBayarModalOpen(true)} variant="primary">
           <HiOutlinePlus size={18} />
           <span>Bayar Iuran</span>
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Main Table */}
       <div className="p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">

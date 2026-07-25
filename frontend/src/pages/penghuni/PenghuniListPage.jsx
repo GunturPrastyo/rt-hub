@@ -16,6 +16,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import PenghuniFormModal from './components/PenghuniFormModal';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function PenghuniListPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,21 +114,15 @@ export default function PenghuniListPage() {
   return (
     <div className="space-y-6">
       {/* Header & Primary Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold font-heading text-slate-800 dark:text-slate-100">
-            Kelola Penghuni
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Data identitas warga, status perkawinan, nomor kontak, dan berkas KTP.
-          </p>
-        </div>
-
+      <PageHeader
+        title="Kelola Penghuni"
+        description="Data identitas warga, status perkawinan, nomor kontak, dan berkas KTP."
+      >
         <Button onClick={handleOpenAddModal} variant="primary">
           <HiOutlinePlus size={18} />
           <span>Tambah Penghuni</span>
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Ringkasan Statistik */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

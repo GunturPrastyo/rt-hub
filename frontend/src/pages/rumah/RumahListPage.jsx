@@ -16,6 +16,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import RumahFormModal from './components/RumahFormModal';
 import RumahDetailDrawer from './components/RumahDetailDrawer';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function RumahListPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,21 +164,15 @@ export default function RumahListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold font-heading text-slate-800 dark:text-slate-100">
-            Kelola Perumahan
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Status hunian rumah, penetapan warga, dan riwayat tagihan.
-          </p>
-        </div>
-
+      <PageHeader
+        title="Kelola Perumahan"
+        description="Status hunian rumah, penetapan warga, dan riwayat tagihan."
+      >
         <Button onClick={handleOpenAddModal} variant="primary">
           <HiOutlinePlus size={18} />
           <span>Tambah Rumah</span>
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Quick Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

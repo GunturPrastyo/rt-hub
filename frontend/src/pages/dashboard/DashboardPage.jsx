@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function DashboardPage() {
   // Data Dummy Finansial 1 Tahun untuk Grafik (Recharts)
@@ -59,19 +60,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header & Quick Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold font-heading text-slate-800 dark:text-slate-100">
-            Dashboard Administrasi RT
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Ringkasan status perumahan, tagihan iuran, dan laporan kas RT.
-          </p>
-        </div>
-
+      <PageHeader
+        title="Dashboard Administrasi RT"
+        description="Ringkasan status perumahan, tagihan iuran, dan laporan kas RT."
+      >
         <div className="flex items-center gap-3">
           <Link
-            to="/transaksi/iuran"
+            to="/transaksi/pemasukan"
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-lg text-sm font-semibold shadow-sm transition-all"
           >
             <HiOutlinePlus size={18} />
@@ -85,7 +80,7 @@ export default function DashboardPage() {
             Catat Pengeluaran
           </Link>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stat Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
