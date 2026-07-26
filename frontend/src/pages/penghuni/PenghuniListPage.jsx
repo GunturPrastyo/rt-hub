@@ -15,12 +15,16 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import PenghuniFormModal from './components/PenghuniFormModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import PageHeader from '../../components/ui/PageHeader';
+import ToastNotification from '../../components/ui/ToastNotification'; 
 
 export default function PenghuniListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [penghuniToDelete, setPenghuniToDelete] = useState(null);
   const [selectedPenghuni, setSelectedPenghuni] = useState(null);
   const [activeKtp, setActiveKtp] = useState(null);
   
@@ -28,6 +32,22 @@ export default function PenghuniListPage() {
   const [penghuniList, setPenghuniList] = useState([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // State for Toast Notification
+  const [toast, setToast] = useState({
+    message: '',
+    type: 'info', // success, error, info
+    isVisible: false,
+  });
+
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type, isVisible: true });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, isVisible: false }));
+  };
 
   const fetchPenghuni = async () => {
     try {
@@ -35,6 +55,7 @@ export default function PenghuniListPage() {
       setPenghuniList(response.data.data);
     } catch (error) {
       console.error("Gagal mengambil data penghuni:", error);
+      showToast('Gagal mengambil data penghuni.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -66,15 +87,26 @@ export default function PenghuniListPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (confirm('Apakah Anda yakin ingin menghapus data penghuni ini?')) {
-      try {
-        await api.delete(`/penghuni/${id}`);
-        fetchPenghuni(); 
-      } catch (error) {
-        console.error("Gagal menghapus data:", error);
-        alert("Gagal menghapus data.");
-      }
+  const handleDeleteClick = (penghuni) => {
+    setPenghuniToDelete(penghuni);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!penghuniToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await api.delete(`/penghuni/${penghuniToDelete.id}`);
+      fetchPenghuni();
+      showToast('Data penghuni berhasil dihapus.', 'success');
+    } catch (error) {
+      console.error("Gagal menghapus data:", error);
+      showToast('Gagal menghapus data.', 'error');
+    } finally {
+      setIsDeleting(false);
+      setIsConfirmModalOpen(false);
+      setPenghuniToDelete(null);
     }
   };
 
@@ -98,16 +130,18 @@ export default function PenghuniListPage() {
         await api.post(`/penghuni/${selectedPenghuni.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         }); 
+        showToast('Data penghuni berhasil diperbarui.', 'success');
       } else {
         await api.post('/penghuni', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+        showToast('Data penghuni berhasil ditambahkan.', 'success');
       }
       setIsModalOpen(false);
       fetchPenghuni(); 
     } catch (error) {
        console.error("Gagal menyimpan data:", error);
-       alert("Terjadi kesalahan saat menyimpan data.");
+       showToast('Terjadi kesalahan saat menyimpan data.', 'error');
     } finally {
        setIsSubmitting(false);
     }
@@ -214,7 +248,7 @@ export default function PenghuniListPage() {
                       <HiOutlinePencilSquare size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(warga.id)}
+                      onClick={() => handleDeleteClick(warga)}
                       className="p-1.5 rounded-md text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                       title="Hapus Warga"
                     >
@@ -238,6 +272,17 @@ export default function PenghuniListPage() {
         onSubmit={handleFormSubmit}
         initialData={selectedPenghuni}
         isSubmitting={isSubmitting}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Konfirmasi Hapus Penghuni"
+        message={`Apakah Anda yakin ingin menghapus data penghuni bernama "${penghuniToDelete?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Ya, Hapus"
+        isConfirming={isDeleting}
+        variant="danger"
       />
 
       {activeKtp && (
@@ -267,6 +312,14 @@ export default function PenghuniListPage() {
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      <ToastNotification
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onDismiss={hideToast}
+      />
     </div>
   );
 }
