@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../services/api'; 
 import { 
   HiOutlinePlus, 
   HiMagnifyingGlass, 
   HiOutlinePencilSquare, 
   HiOutlineTrash, 
   HiOutlinePhone,
-  HiOutlineUserGroup,
-  HiOutlineUsers,
   HiOutlineHeart,
   HiOutlineEye,
   HiXMark
@@ -23,51 +22,29 @@ export default function PenghuniListPage() {
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPenghuni, setSelectedPenghuni] = useState(null);
+  const [activeKtp, setActiveKtp] = useState(null);
+  
+  // State API
+  const [penghuniList, setPenghuniList] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // State untuk Preview KTP Fullscreen (Murni React State)
-  const [activeKtp, setActiveKtp] = useState(null); // { url, nama }
-
-  // Master Data Penghuni
-  const [penghuniList, setPenghuniList] = useState([
-    {
-      id: 101,
-      nama: 'Budi Santoso',
-      telepon: '081234567890',
-      statusWarga: 'Tetap',
-      statusPernikahan: 'Menikah',
-      rumahSaatIni: 'A-01',
-      fotoKtp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=1000'
-    },
-    {
-      id: 102,
-      nama: 'Ahmad Dahlan',
-      telepon: '081987654321',
-      statusWarga: 'Tetap',
-      statusPernikahan: 'Menikah',
-      rumahSaatIni: 'A-02',
-      fotoKtp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=1000'
-    },
-    {
-      id: 103,
-      nama: 'Siti Nurhaliza',
-      telepon: '085612348765',
-      statusWarga: 'Kontrak',
-      statusPernikahan: 'Belum Menikah',
-      rumahSaatIni: 'B-01',
-      fotoKtp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=1000'
-    },
-    {
-      id: 104,
-      nama: 'Eko Prasetyo',
-      telepon: '082143658709',
-      statusWarga: 'Tetap',
-      statusPernikahan: 'Menikah',
-      rumahSaatIni: 'Belum Menempati',
-      fotoKtp: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=1000'
+  const fetchPenghuni = async () => {
+    try {
+      const response = await api.get('/penghuni');
+      setPenghuniList(response.data.data);
+    } catch (error) {
+      console.error("Gagal mengambil data penghuni:", error);
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
 
-  // Filter Data
+  useEffect(() => {
+    fetchPenghuni();
+    
+  }, []);
+
   const filteredPenghuni = penghuniList.filter((item) => {
     const matchesSearch = 
       item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -89,31 +66,55 @@ export default function PenghuniListPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Apakah Anda yakin ingin menghapus data penghuni ini?')) {
-      setPenghuniList((prev) => prev.filter((item) => item.id !== id));
+      try {
+        await api.delete(`/penghuni/${id}`);
+        fetchPenghuni(); 
+      } catch (error) {
+        console.error("Gagal menghapus data:", error);
+        alert("Gagal menghapus data.");
+      }
     }
   };
 
-  const handleFormSubmit = (data) => {
-    if (selectedPenghuni) {
-      setPenghuniList((prev) =>
-        prev.map((item) => (item.id === selectedPenghuni.id ? { ...item, ...data } : item))
-      );
-    } else {
-      const newPenghuni = {
-        id: Date.now(),
-        rumahSaatIni: 'Belum Menempati',
-        ...data,
-      };
-      setPenghuniList((prev) => [newPenghuni, ...prev]);
+  const handleFormSubmit = async (data) => {
+    setIsSubmitting(true);
+    
+    const formData = new FormData();
+    formData.append('nama', data.nama);
+    formData.append('telepon', data.telepon);
+    formData.append('status_warga', data.statusWarga); 
+    formData.append('status_pernikahan', data.statusPernikahan);
+    
+    if (data.fotoKtpFile) {
+        formData.append('foto_ktp', data.fotoKtpFile);
     }
-    setIsModalOpen(false);
+
+    try {
+      if (selectedPenghuni) {
+        formData.append('_method', 'PUT'); 
+
+        await api.post(`/penghuni/${selectedPenghuni.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }); 
+      } else {
+        await api.post('/penghuni', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+      setIsModalOpen(false);
+      fetchPenghuni(); 
+    } catch (error) {
+       console.error("Gagal menyimpan data:", error);
+       alert("Terjadi kesalahan saat menyimpan data.");
+    } finally {
+       setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header & Primary Action */}
       <PageHeader
         title="Kelola Penghuni"
         description="Data identitas warga, status perkawinan, nomor kontak, dan berkas KTP."
@@ -124,9 +125,7 @@ export default function PenghuniListPage() {
         </Button>
       </PageHeader>
 
-      {/* Main Content Card */}
       <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-        {/* Filter Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-slate-100 dark:border-slate-700/80">
           <div className="w-full sm:w-72">
             <Input
@@ -154,8 +153,9 @@ export default function PenghuniListPage() {
           </div>
         </div>
 
-        {/* Grid Cards (3 Kolom Desktop) */}
-        {filteredPenghuni.length > 0 ? (
+        {isLoading ? (
+           <div className="p-12 text-center text-sm text-slate-400">Memuat data...</div>
+        ) : filteredPenghuni.length > 0 ? (
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredPenghuni.map((warga) => (
               <div
@@ -163,7 +163,6 @@ export default function PenghuniListPage() {
                 className="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex flex-col justify-between"
               >
                 <div>
-                  {/* Header Card */}
                   <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
                     <div className="min-w-0">
                       <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 truncate">
@@ -179,7 +178,6 @@ export default function PenghuniListPage() {
                     </Badge>
                   </div>
 
-                  {/* Body Card Details */}
                   <div className="py-4 space-y-2.5 text-xs">
                     <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-300">
                       <HiOutlinePhone className="w-4 h-4 text-slate-600 shrink-0" />
@@ -193,18 +191,19 @@ export default function PenghuniListPage() {
                   </div>
                 </div>
 
-                {/* Footer Actions */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                  
-                  {/* Tombol Lihat KTP */}
-                  <button
-                    type="button"
-                    onClick={() => setActiveKtp({ url: warga.fotoKtp, nama: warga.nama })}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors cursor-pointer"
-                  >
-                    <HiOutlineEye size={16} />
-                    <span>Lihat KTP</span>
-                  </button>
+                  {warga.fotoKtp ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveKtp({ url: warga.fotoKtp, nama: warga.nama })}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors cursor-pointer"
+                    >
+                      <HiOutlineEye size={16} />
+                      <span>Lihat KTP</span>
+                    </button>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">Tidak ada KTP</span>
+                  )}
 
                   <div className="flex items-center gap-1">
                     <button
@@ -228,26 +227,24 @@ export default function PenghuniListPage() {
           </div>
         ) : (
           <div className="p-12 text-center">
-            <p className="text-sm text-slate-400">Tidak ada data penghuni yang sesuai.</p>
+            <p className="text-sm text-slate-400">Tidak ada data penghuni yang ditemukan.</p>
           </div>
         )}
       </div>
 
-      {/* Modal Form Tambah/Edit */}
       <PenghuniFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleFormSubmit}
         initialData={selectedPenghuni}
+        isSubmitting={isSubmitting}
       />
 
-      {/* Lightbox / Preview Foto KTP Fullscreen (Murni React) */}
       {activeKtp && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in duration-200"
           onClick={() => setActiveKtp(null)}
         >
-          {/* Header Title & Close Button Floating Top Right */}
           <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 flex items-center gap-3">
             <span className="text-xs font-semibold text-slate-300 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
               KTP - {activeKtp.nama}
@@ -260,14 +257,12 @@ export default function PenghuniListPage() {
               <HiXMark size={22} />
             </button>
           </div>
-
-          {/* Gambar KTP Fullscreen Centered */}
           <div className="relative max-w-4xl max-h-[85vh] w-full flex items-center justify-center">
             <img
               src={activeKtp.url}
               alt={`Foto KTP ${activeKtp.nama}`}
               className="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl border border-slate-800"
-              onClick={(e) => e.stopPropagation()} // Supaya klik gambar tidak mentrigger close
+              onClick={(e) => e.stopPropagation()} 
             />
           </div>
         </div>
