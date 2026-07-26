@@ -16,7 +16,7 @@ Route::post('/login', [AuthController::class, 'login']);
 | Protected Routes (Authenticated RT/Admin)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);

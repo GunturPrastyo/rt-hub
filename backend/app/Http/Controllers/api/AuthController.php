@@ -5,22 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\JWTGuard;
+use App\Models\User;
+use Laravel\Sanctum\PersonalAccessToken; // <-- Tambahkan import ini untuk Type Hint token
 
 class AuthController extends Controller
 {
     /**
-     * Helper untuk mendapatkan JWT Guard dengan Type Hinting untuk IDE/Intelephense
-     */
-    private function guard(): JWTGuard
-    {
-        /** @var JWTGuard $guard */
-        $guard = Auth::guard('api');
-        return $guard;
-    }
-
-    /**
-     * Authenticate User (RT/Admin) & Return JWT Token
+     * Authenticate User (RT/Admin/Warga) & Return Sanctum Token
      */
     public function login(Request $request)
     {
@@ -29,7 +20,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (! $token = $this->guard()->attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
             return $this->jsonResponse(
                 success: false,
                 message: 'Email atau password salah.',
@@ -37,27 +28,38 @@ class AuthController extends Controller
             );
         }
 
-        return $this->respondWithToken($token, 'Login berhasil.');
+        /** @var User $user */ // <-- Disederhanakan menjadi 'User' saja
+        $user = Auth::user();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return $this->respondWithToken($token, 'Login berhasil.', $user);
     }
 
     /**
      * Get Authenticated User Profile
      */
-    public function me()
+    public function me(Request $request)
     {
         return $this->jsonResponse(
             success: true,
             message: 'Data profil berhasil diambil.',
-            data: $this->guard()->user()
+            data: $request->user()
         );
     }
 
     /**
      * Logout User & Invalidate Token
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        $this->guard()->logout();
+        /** @var User $user */ // <-- Disederhanakan menjadi 'User' saja
+        $user = $request->user();
+
+        /** @var PersonalAccessToken $token */ // <-- Memberitahu Intelephense bahwa ini adalah object Token
+        $token = $user->currentAccessToken();
+        
+        $token->delete(); // Sekarang Intelephense tahu bahwa fungsi delete() ada!
 
         return $this->jsonResponse(
             success: true,
@@ -66,25 +68,16 @@ class AuthController extends Controller
     }
 
     /**
-     * Refresh JWT Token
+     * Format Response Token Sanctum
      */
-    public function refresh()
-    {
-        return $this->respondWithToken($this->guard()->refresh(), 'Token berhasil diperbarui.');
-    }
-
-    /**
-     * Format Response Token JWT
-     */
-    protected function respondWithToken(string $token, string $message)
+    protected function respondWithToken(string $token, string $message, User $user) 
     {
         return response()->json([
             'success'      => true,
             'message'      => $message,
             'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => $this->guard()->factory()->getTTL() * 60,
-            'user'         => $this->guard()->user(),
+            'token_type'   => 'Bearer',
+            'user'         => $user,
         ], 200);
     }
 }
