@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react_router_dom';
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
