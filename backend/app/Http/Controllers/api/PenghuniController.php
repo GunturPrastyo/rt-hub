@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Penghuni;
+use App\Http\Resources\PenghuniResource;
+use App\Services\PenghuniService;
+use Illuminate\Http\Request;
+
+class PenghuniController extends Controller
+{
+    public function __construct(protected PenghuniService $service) {}
+
+    public function index()
+    {
+        return PenghuniResource::collection(Penghuni::with('rumah')->latest()->get());
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string',
+            'telepon' => 'required|string',
+            'status_warga' => 'required|in:Tetap,Kontrak',
+            'status_pernikahan' => 'required|in:Menikah,Belum Menikah',
+            'foto_ktp' => 'nullable|image|max:2048'
+        ]);
+
+        $penghuni = $this->service->storePenghuni($validated, $request->file('foto_ktp'));
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Data penghuni berhasil ditambahkan.',
+            'data' => new PenghuniResource($penghuni)
+        ], 201);
+    }
+
+    public function update(Request $request, Penghuni $penghuni)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string',
+            'telepon' => 'required|string',
+            'status_warga' => 'required|in:Tetap,Kontrak',
+            'status_pernikahan' => 'required|in:Menikah,Belum Menikah',
+            'foto_ktp' => 'nullable|image|max:2048'
+        ]);
+
+        $penghuni = $this->service->updatePenghuni($penghuni, $validated, $request->file('foto_ktp'));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data penghuni berhasil diperbarui.',
+            'data' => new PenghuniResource($penghuni)
+        ]);
+    }
+
+    public function destroy(Penghuni $penghuni)
+    {
+        $this->service->deletePenghuni($penghuni);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data penghuni berhasil dihapus.'
+        ]);
+    }
+}
