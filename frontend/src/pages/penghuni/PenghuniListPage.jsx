@@ -16,6 +16,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import PenghuniFormModal from './components/PenghuniFormModal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import PenghuniCardSkeleton from './components/PenghuniCardSkeleton';
 import PageHeader from '../../components/ui/PageHeader';
 import ToastNotification from '../../components/ui/ToastNotification'; 
 
@@ -188,7 +189,11 @@ export default function PenghuniListPage() {
         </div>
 
         {isLoading ? (
-           <div className="p-12 text-center text-sm text-slate-400">Memuat data...</div>
+           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+             {Array.from({ length: 6 }).map((_, index) => (
+               <PenghuniCardSkeleton key={index} />
+             ))}
+           </div>
         ) : filteredPenghuni.length > 0 ? (
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredPenghuni.map((warga) => (
