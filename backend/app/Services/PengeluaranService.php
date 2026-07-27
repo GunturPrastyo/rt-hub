@@ -48,4 +48,19 @@ class PengeluaranService
             'sisaSaldo' => (int) (($totalPemasukan ?? 0) - ($totalPengeluaran ?? 0)),
         ];
     }
+
+    public function getTotalPengeluaranByMonthYear(int $month, int $year)
+    {
+        return Pengeluaran::whereYear('tanggal', $year)
+                          ->whereMonth('tanggal', $month)
+                          ->sum('nominal');
+    }
+
+    public function getMutasiPengeluaranByMonthYear(int $month, int $year)
+    {
+        return Pengeluaran::whereYear('tanggal', $year)
+                          ->whereMonth('tanggal', $month)
+                          ->orderBy('tanggal', 'desc')
+                          ->get();
+    }
 }

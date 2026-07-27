@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PemasukanController;
 use App\Http\Controllers\Api\PengeluaranController;
 use App\Http\Controllers\Api\PenghuniController;
+use App\Http\Controllers\Api\LaporanController;
 use App\Http\Controllers\Api\RumahController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,3 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/iuran/status', [PemasukanController::class, 'statusIuran']);
     Route::post('/iuran', [PemasukanController::class, 'store']);
 });
+
+// Laporan Finansial
+Route::middleware('auth:sanctum')->get('/laporan/finansial', [LaporanController::class, 'finansial']);

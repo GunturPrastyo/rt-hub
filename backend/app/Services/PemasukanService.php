@@ -33,7 +33,7 @@ class PemasukanService
             }
 
             if (!$tanggalMasuk) {
-                // If no current house or move-in date, assume no expected payments for simplicity
+               
                 return [
                     'id' => $warga->id,
                     'nama' => $warga->nama,
@@ -50,7 +50,6 @@ class PemasukanService
             $startMonthForCalculation = max($tanggalMasuk->month, 1);
             $startYearForCalculation = $tanggalMasuk->year;
             
-            // If move-in was in a previous year, start calculation from Jan of current year
             if ($tanggalMasuk->year < $currentYear) {
                 $startMonthForCalculation = 1;
                 $startYearForCalculation = $currentYear;
@@ -60,13 +59,11 @@ class PemasukanService
             if ($startYearForCalculation === $currentYear) {
                 $expectedMonths = $currentMonth - $startMonthForCalculation + 1;
             } else {
-                // This case should ideally not happen if we start from current year
-                // If the resident moved in in a previous year, and we are calculating for the current year
-                // Expected months are from Jan of current year to current month
+                
                 $expectedMonths = $currentMonth;
             }
             
-            $expectedMonths = max(0, $expectedMonths); // Ensure expectedMonths is not negative
+            $expectedMonths = max(0, $expectedMonths); 
 
             $totalBulanKebersihanPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_kebersihan');
             $totalBulanSatpamPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_satpam');
@@ -107,5 +104,21 @@ class PemasukanService
     public function getTotalPemasukan()
     {
         return Pemasukan::sum('total');
+    }
+
+    public function getTotalPemasukanByMonthYear(int $month, int $year)
+    {
+        return Pemasukan::whereYear('tanggal_bayar', $year)
+                        ->whereMonth('tanggal_bayar', $month)
+                        ->sum('total');
+    }
+
+    public function getMutasiPemasukanByMonthYear(int $month, int $year)
+    {
+        return Pemasukan::with('penghuni')
+                        ->whereYear('tanggal_bayar', $year)
+                        ->whereMonth('tanggal_bayar', $month)
+                        ->orderBy('tanggal_bayar', 'desc')
+                        ->get();
     }
 }
