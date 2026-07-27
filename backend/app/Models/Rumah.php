@@ -8,12 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Rumah extends Model
 {
     use HasFactory;
-    protected $table = 'Rumah'; 
-    
+    protected $table = 'Rumah';
+
     protected $guarded = ['id'];
 
     public function penghuni()
     {
         return $this->belongsTo(Penghuni::class, 'penghuni_id');
+    }
+
+    public function historiPenghuni()
+    {
+        return $this->hasMany(HistoriPenghuni::class, 'rumah_id')
+            ->orderBy('tanggal_masuk', 'desc');
     }
 }

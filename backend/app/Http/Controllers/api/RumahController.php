@@ -15,7 +15,8 @@ class RumahController extends Controller
     public function index()
     {
         
-        return RumahResource::collection(Rumah::with('penghuni')->latest()->get());
+        $rumah = Rumah::with(['penghuni', 'historiPenghuni.penghuni'])->latest()->get();
+        return RumahResource::collection($rumah);
     }
 
     public function store(Request $request)
