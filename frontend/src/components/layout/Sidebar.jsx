@@ -49,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }) {
     { 
       name: 'Laporan Finansial', 
       icon: HiOutlineChartBar, 
-      link: '/laporan/finansial' 
+      link: '/laporan' 
     },
   ];
 

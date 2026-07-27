@@ -3,34 +3,34 @@ import ProtectedRoute from '../components/layout/ProtectedRoute';
 import MainLayout from '../components/layout/MainLayout';
 
 // Auth Page
-import LoginPage from '../pages/auth/LoginPage'; 
+import LoginPage from '../pages/auth/LoginPage';
 
 // Main Pages
 import DashboardPage from '../pages/dashboard/DashboardPage';
 import RumahListPage from '../pages/rumah/RumahListPage';
 import PenghuniListPage from '../pages/penghuni/PenghuniListPage';
 import LaporanFinansialPage from '../pages/laporan/LaporanFinansialPage';
-import TransaksiPage from '../pages/transaksi/TransaksiPage'; 
+import TransaksiPage from '../pages/transaksi/TransaksiPage';
 
 export default function AppRouter() {
   return (
-    <BrowserRouter> 
+    <BrowserRouter>
       <Routes>
         {/* Public Route (Login) */}
+        <Route path="" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Protected Routes (Harus Login) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<MainLayout />}>
-            <Route index element={<DashboardPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="rumah" element={<RumahListPage />} />
             <Route path="penghuni" element={<PenghuniListPage />} />
-            
+
             <Route path="transaksi" element={<TransaksiPage />} />
-            {/* Path Laporan */}
-            <Route path="laporan">
-              <Route path="finansial" element={<LaporanFinansialPage />} />
-            </Route>
+
+            <Route path="laporan" element={<LaporanFinansialPage />} />
+
           </Route>
         </Route>
 
