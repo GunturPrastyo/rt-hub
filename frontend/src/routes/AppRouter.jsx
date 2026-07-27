@@ -9,9 +9,8 @@ import LoginPage from '../pages/auth/LoginPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
 import RumahListPage from '../pages/rumah/RumahListPage';
 import PenghuniListPage from '../pages/penghuni/PenghuniListPage';
-import PemasukanIuranPage from '../pages/transaksi/pemasukan/PemasukanIuranPage';
-import PengeluaranRtPage from '../pages/transaksi/pengeluaran/PengeluaranRtPage';
-import LaporanFinansialPage from '../pages/laporan/LaporanFinansialPage'; 
+import LaporanFinansialPage from '../pages/laporan/LaporanFinansialPage';
+import TransaksiPage from '../pages/transaksi/TransaksiPage'; 
 
 export default function AppRouter() {
   return (
@@ -27,12 +26,7 @@ export default function AppRouter() {
             <Route path="rumah" element={<RumahListPage />} />
             <Route path="penghuni" element={<PenghuniListPage />} />
             
-            {/* Path Transaksi */}
-            <Route path="transaksi">
-              <Route path="pemasukan" element={<PemasukanIuranPage />} />
-              <Route path="pengeluaran" element={<PengeluaranRtPage />} />
-            </Route>
-
+            <Route path="transaksi" element={<TransaksiPage />} />
             {/* Path Laporan */}
             <Route path="laporan">
               <Route path="finansial" element={<LaporanFinansialPage />} />

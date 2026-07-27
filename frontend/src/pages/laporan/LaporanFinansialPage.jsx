@@ -9,7 +9,9 @@ import Badge from '../../components/ui/Badge';
 import PageHeader from '../../components/ui/PageHeader';
 
 export default function LaporanFinansialPage() {
-  const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
+  const [selectedBulan, setSelectedBulan] = useState(
+    () => new Date().toLocaleString('id-ID', { month: 'long', year: 'numeric' })
+  );
 
   const reportTahunan = [
     { bulan: 'Jan', pemasukan: 3500000, pengeluaran: 1800000 },

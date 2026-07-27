@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import api from '../../../services/api';
+import api from '../../services/api';
 import { HiOutlinePlus, HiOutlineBanknotes, HiOutlineFunnel } from 'react-icons/hi2';
-import Button from '../../../components/ui/Button';
-import PengeluaranFormModal from './components/PengeluaranFormModal';
-import PageHeader from '../../../components/ui/PageHeader';
+import Button from '../ui/Button';
+import PengeluaranFormModal from './PengeluaranFormModal';
 
-export default function PengeluaranRtPage() {
-  const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
+export default function PengeluaranTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pengeluaranList, setPengeluaranList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,34 +28,30 @@ export default function PengeluaranRtPage() {
     try {
       await api.post('/pengeluaran', data);
       setIsModalOpen(false);
-      fetchPengeluaran(); // Refresh data dari backend
+      fetchPengeluaran(); 
     } catch (error) {
       console.error(error);
       alert('Gagal menyimpan pengeluaran');
     }
   };
 
-  const totalPengeluaranBulanIni = pengeluaranList.reduce((acc, curr) => acc + curr.nominal, 0);
-
   return (
-    <div className="space-y-6">
-      <PageHeader title="Pengeluaran Operasional RT" description="Pencatatan pengeluaran kas RT seperti gaji satpam, kebersihan, dan perbaikan fasilitas.">
-        <Button onClick={() => setIsModalOpen(true)} variant="primary">
-          <HiOutlinePlus size={18} />
-          <span>Catat Pengeluaran</span>
-        </Button>
-      </PageHeader>
-
-      {/* Ringkasan Banner */}
-      <div className="p-5 bg-white dark:bg-slate-800 rounded-lg shadow-sm flex items-center justify-between border border-slate-200 dark:border-slate-700">
+    <div className="p-2 space-y-6">
+      {/* Header Halaman Responsif */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Pengeluaran</div>
-          <div className="text-2xl font-bold text-rose-600 mt-1">
-            Rp {totalPengeluaranBulanIni.toLocaleString('id-ID')}
-          </div>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">
+            Pengeluaran Operasional RT
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Pencatatan pengeluaran kas RT seperti gaji satpam, kebersihan, dan perbaikan fasilitas.
+          </p>
         </div>
-        <div className="w-11 h-11 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-          <HiOutlineBanknotes size={22} />
+        <div className="flex-shrink-0">
+          <Button onClick={() => setIsModalOpen(true)} variant="primary">
+            <HiOutlinePlus size={18} />
+            <span>Catat Pengeluaran</span>
+          </Button>
         </div>
       </div>
 

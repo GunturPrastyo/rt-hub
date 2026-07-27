@@ -1,6 +1,6 @@
-import Modal from '../../../../components/ui/Modal';
-import Button from '../../../../components/ui/Button';
-import Input from '../../../../components/ui/Input';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
 import { HiOutlineDocumentText, HiOutlineBanknotes } from 'react-icons/hi2';
 
 export default function PengeluaranFormModal({ isOpen, onClose, onSubmit }) {

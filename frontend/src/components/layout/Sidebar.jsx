@@ -42,12 +42,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
     { heading: 'Keuangan & Transaksi' },
     {
-      name: 'Transaksi',
+      name: 'Transaksi Kas',
       icon: HiOutlineCreditCard,
-      children: [
-        { name: 'Pemasukan Iuran', link: '/transaksi/pemasukan', icon: HiOutlineReceiptPercent },
-        { name: 'Pengeluaran RT', link: '/transaksi/pengeluaran', icon: HiOutlineArrowTrendingDown },
-      ],
+      link: '/transaksi',
     },
     { 
       name: 'Laporan Finansial', 

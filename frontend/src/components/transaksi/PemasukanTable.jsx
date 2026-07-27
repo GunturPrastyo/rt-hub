@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import api from '../../../services/api';
+import api from '../../services/api';
 import { HiOutlinePlus, HiMagnifyingGlass } from 'react-icons/hi2';
-import Badge from '../../../components/ui/Badge';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import BayarIuranModal from './components/BayarIuranModal';
-import PageHeader from '../../../components/ui/PageHeader';
+import Badge from '../ui/Badge';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import BayarIuranModal from './BayarIuranModal';
 
-export default function PemasukanIuranPage() {
-  const [selectedBulan, setSelectedBulan] = useState('Juli 2026');
+export default function PemasukanTable() {
+  const [selectedBulan, setSelectedBulan] = useState(
+    () => new Date().toLocaleString('id-ID', { month: 'long', year: 'numeric' })
+  );
   const [searchWargaQuery, setSearchWargaQuery] = useState('');
   const [isBayarModalOpen, setIsBayarModalOpen] = useState(false);
   const [statusIuranWarga, setStatusIuranWarga] = useState([]);
@@ -33,7 +34,7 @@ export default function PemasukanIuranPage() {
     try {
       await api.post('/iuran', data);
       setIsBayarModalOpen(false);
-      fetchStatusIuran(); // Refresh data status pembayaran
+      fetchStatusIuran(); 
     } catch (error) {
       console.error(error);
       alert('Gagal menyimpan pembayaran');
@@ -46,13 +47,23 @@ export default function PemasukanIuranPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Pemasukan Iuran Warga" description="Monitoring pembayaran iuran kebersihan dan satpam.">
-        <Button onClick={() => setIsBayarModalOpen(true)} variant="primary">
-          <HiOutlinePlus size={18} />
-          <span>Bayar Iuran</span>
-        </Button>
-      </PageHeader>
+    <div className="p-2 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">
+            Pemasukan Iuran Warga
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Monitoring pembayaran iuran kebersihan dan satpam.
+          </p>
+        </div>
+        <div className="flex-shrink-0">
+          <Button onClick={() => setIsBayarModalOpen(true)} variant="primary">
+            <HiOutlinePlus size={18} />
+            <span>Bayar Iuran</span>
+          </Button>
+        </div>
+      </div>
 
       <div className="p-6 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
         <div className="mb-4 w-full sm:w-72">

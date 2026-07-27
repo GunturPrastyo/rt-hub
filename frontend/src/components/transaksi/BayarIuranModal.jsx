@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import Modal from '../../../../components/ui/Modal';
-import Button from '../../../../components/ui/Button';
-import Input from '../../../../components/ui/Input';
-import Badge from '../../../../components/ui/Badge';
+import Modal from '../ui/Modal';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import Badge from '../ui/Badge';
 import { 
   HiMagnifyingGlass, 
   HiChevronDown,
