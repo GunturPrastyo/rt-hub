@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../services/api'; 
 import { 
   HiOutlinePlus, 
   HiMagnifyingGlass, 
@@ -6,9 +7,6 @@ import {
   HiOutlineTrash, 
   HiOutlineEye,
   HiOutlineUser,
-  HiOutlineHome,
-  HiOutlineBuildingOffice2,
-  HiOutlineUserGroup,
   HiOutlineReceiptPercent
 } from 'react-icons/hi2';
 import Badge from '../../components/ui/Badge';
@@ -25,87 +23,32 @@ export default function RumahListPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedRumah, setSelectedRumah] = useState(null);
 
-  // Master Data Penghuni
-  const [availablePenghuni] = useState([
-    { id: 101, nama: 'Budi Santoso', statusWarga: 'Tetap', nik: '331002348210001' },
-    { id: 102, nama: 'Ahmad Dahlan', statusWarga: 'Tetap', nik: '331002348210002' },
-    { id: 103, nama: 'Siti Nurhaliza', statusWarga: 'Kontrak', nik: '331002348210003' },
-    { id: 104, nama: 'Eko Prasetyo', statusWarga: 'Tetap', nik: '331002348210004' },
-  ]);
+  // State API Integrations
+  const [rumahList, setRumahList] = useState([]);
+  const [availablePenghuni, setAvailablePenghuni] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Master Data Rumah + History
-  const [rumahList, setRumahList] = useState([
-    {
-      id: 1,
-      nomorRumah: 'A-01',
-      blok: 'Blok A',
-      status: 'Dihuni',
-      penghuniId: 101,
-      penghuniNama: 'Budi Santoso',
-      tipePenghuni: 'Tetap',
-      historyPenghuni: [
-        { nama: 'Budi Santoso', periodeMasuk: 'Jan 2024', periodeKeluar: null, statusKontrak: 'Aktif' },
-        { nama: 'Joko Widodo', periodeMasuk: 'Jan 2022', periodeKeluar: 'Des 2023', statusKontrak: 'Selesai' }
-      ],
-      historyPembayaran: [
-        { bulan: 'Juli 2026', nominal: 115000, status: 'Lunas', penghuniSaatItu: 'Budi Santoso' },
-        { bulan: 'Juni 2026', nominal: 115000, status: 'Lunas', penghuniSaatItu: 'Budi Santoso' },
-        { bulan: 'Mei 2026', nominal: 115000, status: 'Belum Bayar', penghuniSaatItu: 'Budi Santoso' }
-      ]
-    },
-    {
-      id: 2,
-      nomorRumah: 'A-02',
-      blok: 'Blok A',
-      status: 'Dihuni',
-      penghuniId: 102,
-      penghuniNama: 'Ahmad Dahlan',
-      tipePenghuni: 'Tetap',
-      historyPenghuni: [
-        { nama: 'Ahmad Dahlan', periodeMasuk: 'Feb 2023', periodeKeluar: null, statusKontrak: 'Aktif' }
-      ],
-      historyPembayaran: [
-        { bulan: 'Juli 2026', nominal: 115000, status: 'Lunas', penghuniSaatItu: 'Ahmad Dahlan' }
-      ]
-    },
-    {
-      id: 3,
-      nomorRumah: 'A-03',
-      blok: 'Blok A',
-      status: 'Kosong',
-      penghuniId: null,
-      penghuniNama: '-',
-      tipePenghuni: '-',
-      historyPenghuni: [],
-      historyPembayaran: []
-    },
-    {
-      id: 4,
-      nomorRumah: 'B-01',
-      blok: 'Blok B',
-      status: 'Dihuni',
-      penghuniId: 103,
-      penghuniNama: 'Siti Nurhaliza',
-      tipePenghuni: 'Kontrak',
-      historyPenghuni: [
-        { nama: 'Siti Nurhaliza', periodeMasuk: 'Mar 2025', periodeKeluar: null, statusKontrak: 'Aktif' }
-      ],
-      historyPembayaran: [
-        { bulan: 'Juli 2026', nominal: 115000, status: 'Belum Bayar', penghuniSaatItu: 'Siti Nurhaliza' }
-      ]
-    },
-    {
-      id: 5,
-      nomorRumah: 'B-02',
-      blok: 'Blok B',
-      status: 'Kosong',
-      penghuniId: null,
-      penghuniNama: '-',
-      tipePenghuni: '-',
-      historyPenghuni: [],
-      historyPembayaran: []
+  
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [responseRumah, responsePenghuni] = await Promise.all([
+        api.get('/rumah'),
+        api.get('/penghuni')
+      ]);
+      setRumahList(responseRumah.data.data);
+      setAvailablePenghuni(responsePenghuni.data.data);
+    } catch (error) {
+      console.error("Gagal mengambil data:", error);
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const filteredRumah = rumahList.filter((item) => {
     const matchesSearch = 
@@ -134,36 +77,48 @@ export default function RumahListPage() {
     setIsDetailOpen(true);
   };
 
-  const handleDelete = (id, e) => {
+  // Fungsi Delete Terhubung API[cite: 6]
+  const handleDelete = async (id, e) => {
     e.stopPropagation();
     if (confirm('Apakah Anda yakin ingin menghapus data rumah ini?')) {
-      setRumahList((prev) => prev.filter((item) => item.id !== id));
+      try {
+        await api.delete(`/rumah/${id}`);
+        fetchData(); // Muat ulang data setelah dihapus
+      } catch (error) {
+        console.error("Gagal menghapus data rumah:", error);
+        alert("Gagal menghapus data.");
+      }
     }
   };
 
-  const handleFormSubmit = (data) => {
-    if (selectedRumah) {
-      setRumahList((prev) =>
-        prev.map((item) => (item.id === selectedRumah.id ? { ...item, ...data } : item))
-      );
-    } else {
-      const newRumah = {
-        id: Date.now(),
-        blok: `Blok ${data.nomorRumah.charAt(0).toUpperCase()}`,
-        ...data,
-        historyPenghuni: data.penghuniNama !== '-' ? [
-          { nama: data.penghuniNama, periodeMasuk: 'Juli 2026', periodeKeluar: null, statusKontrak: 'Aktif' }
-        ] : [],
-        historyPembayaran: []
+  const handleFormSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+    
+      const payload = {
+        nomor_rumah: data.nomorRumah,
+        status: data.status,
+        penghuni_id: data.penghuniId || null,
+        blok: data.nomorRumah ? `Blok ${data.nomorRumah.charAt(0).toUpperCase()}` : null
       };
-      setRumahList((prev) => [newRumah, ...prev]);
+
+      if (selectedRumah) {
+        await api.put(`/rumah/${selectedRumah.id}`, payload);
+      } else {
+        await api.post('/rumah', payload);
+      }
+      setIsModalOpen(false);
+      fetchData(); 
+    } catch (error) {
+      console.error("Gagal menyimpan data rumah:", error);
+      alert(error.response?.data?.message || "Terjadi kesalahan saat menyimpan data.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsModalOpen(false);
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <PageHeader
         title="Kelola Perumahan"
         description="Status hunian rumah, penetapan warga, dan riwayat tagihan."
@@ -175,7 +130,6 @@ export default function RumahListPage() {
       </PageHeader>
 
       <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-        {/* Filter Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-slate-100 dark:border-slate-700/80">
           <div className="w-full sm:w-72">
             <Input
@@ -203,8 +157,10 @@ export default function RumahListPage() {
           </div>
         </div>
 
-        {/* Grid Card Unit Rumah (3 Kolom Max di Desktop) */}
-        {filteredRumah.length > 0 ? (
+        {/* Handling Status Loading[cite: 6] */}
+        {isLoading ? (
+          <div className="p-12 text-center text-sm text-slate-400">Memuat data perumahan...</div>
+        ) : filteredRumah.length > 0 ? (
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredRumah.map((rumah) => (
               <div
@@ -213,7 +169,6 @@ export default function RumahListPage() {
                 className="group p-5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div>
-                  {/* Header Card */}
                   <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-sm shrink-0 whitespace-nowrap">
@@ -231,7 +186,6 @@ export default function RumahListPage() {
                     </Badge>
                   </div>
 
-                  {/* Body Card */}
                   <div className="py-4 space-y-2">
                     <div className="flex items-start gap-2.5">
                       <HiOutlineUser size={18} className="text-slate-400 shrink-0 mt-0.5" />
@@ -250,7 +204,6 @@ export default function RumahListPage() {
                   </div>
                 </div>
 
-                {/* Footer Card */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs text-slate-400">
                     <HiOutlineReceiptPercent size={15} />
