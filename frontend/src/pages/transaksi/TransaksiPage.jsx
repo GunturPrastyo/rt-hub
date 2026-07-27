@@ -5,7 +5,6 @@ import api from '../../services/api';
 import PemasukanTable from '../../components/transaksi/PemasukanTable';
 import PengeluaranTable from '../../components/transaksi/PengeluaranTable';
 
-
 const InfoCard = ({ title, value, icon: Icon, loading }) => (
   <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md flex items-center">
     <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
@@ -28,21 +27,22 @@ export default function TransaksiPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get('/summary');
-        setSummary(response.data.data);
-        setError(null);
-      } catch (err) {
-        setError('Gagal memuat ringkasan data.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Pindahkan fetchSummary ke luar useEffect agar bisa dikirim ke child component
+  const fetchSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/summary');
+      setSummary(response.data.data);
+      setError(null);
+    } catch (err) {
+      setError('Gagal memuat ringkasan data.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSummary();
   }, []);
 
@@ -50,8 +50,6 @@ export default function TransaksiPage() {
 
   return (
     <div className="space-y-6">
-      
-
       {/* Kartu Ringkasan */}
       {error && <p className="text-red-500">{error}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,8 +87,15 @@ export default function TransaksiPage() {
 
         {/* Konten Tab */}
         <div className="p-4">
-          {activeTab === 'pemasukan' && <PemasukanTable />}
-          {activeTab === 'pengeluaran' && <PengeluaranTable />}
+          {activeTab === 'pemasukan' && (
+            <PemasukanTable onTransactionSuccess={fetchSummary} />
+          )}
+          {activeTab === 'pengeluaran' && (
+            <PengeluaranTable 
+              sisaSaldo={summary.sisaSaldo} 
+              onTransactionSuccess={fetchSummary} 
+            />
+          )}
         </div>
       </div>
     </div>

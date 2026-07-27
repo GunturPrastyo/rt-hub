@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { HiOutlinePlus, HiOutlineBanknotes, HiOutlineFunnel } from 'react-icons/hi2';
+import { HiOutlinePlus } from 'react-icons/hi2';
 import Button from '../ui/Button';
-import PengeluaranFormModal from './PengeluaranFormModal';
+import PengeluaranFormModal from './PengeluaranModal';
 
-export default function PengeluaranTable() {
+export default function PengeluaranTable({ sisaSaldo, onTransactionSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pengeluaranList, setPengeluaranList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchPengeluaran = async () => {
     try {
@@ -25,13 +26,19 @@ export default function PengeluaranTable() {
   }, []);
 
   const handleSimpanPengeluaran = async (data) => {
+    setIsSubmitting(true);
     try {
       await api.post('/pengeluaran', data);
       setIsModalOpen(false);
       fetchPengeluaran(); 
+      // Panggil fungsi ini agar 3 kartu summary di halaman induk ikut ter-update
+      if (onTransactionSuccess) onTransactionSuccess(); 
     } catch (error) {
       console.error(error);
-      alert('Gagal menyimpan pengeluaran');
+      // Tangkap pesan ValidationException dari Laravel agar muncul ke user jika di-bypass
+      alert(error.response?.data?.message || 'Gagal menyimpan pengeluaran');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -93,6 +100,8 @@ export default function PengeluaranTable() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSimpanPengeluaran}
+        sisaSaldo={sisaSaldo}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

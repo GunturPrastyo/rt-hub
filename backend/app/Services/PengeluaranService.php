@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Pengeluaran;
 use App\Services\PemasukanService;
+use Illuminate\Validation\ValidationException;
 
 class PengeluaranService
 {
@@ -34,6 +35,14 @@ class PengeluaranService
 
     public function storePengeluaran(array $data)
     {
+        $sisaSaldo = $this->getSisaSaldo();
+
+        if ($data['nominal'] > $sisaSaldo) {
+            throw ValidationException::withMessages([
+                'nominal' => 'Gagal: Nominal pengeluaran melebihi sisa saldo kas saat ini (Sisa Saldo: Rp ' . number_format($sisaSaldo, 0, ',', '.') . ').'
+            ]);
+        }
+
         return Pengeluaran::create($data);
     }
 

@@ -33,7 +33,6 @@ class PemasukanService
             }
 
             if (!$tanggalMasuk) {
-               
                 return [
                     'id' => $warga->id,
                     'nama' => $warga->nama,
@@ -59,7 +58,6 @@ class PemasukanService
             if ($startYearForCalculation === $currentYear) {
                 $expectedMonths = $currentMonth - $startMonthForCalculation + 1;
             } else {
-                
                 $expectedMonths = $currentMonth;
             }
             
@@ -68,21 +66,52 @@ class PemasukanService
             $totalBulanKebersihanPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_kebersihan');
             $totalBulanSatpamPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_satpam');
             
-            $tunggakanKebersihan = max(0, $expectedMonths - $totalBulanKebersihanPaid); 
-            $tunggakanSatpam = max(0, $expectedMonths - $totalBulanSatpamPaid);
+            // LOGIKA BARU: Menghitung selisih pembayaran
+            $selisihKebersihan = $totalBulanKebersihanPaid - $expectedMonths;
+            $selisihSatpam = $totalBulanSatpamPaid - $expectedMonths;
+
+            // Penentuan Status Iuran Kebersihan
+            if ($selisihKebersihan < 0) {
+                $statusKeb = "Nunggak " . abs($selisihKebersihan) . " Bulan";
+                $isKebLunas = false;
+                $tunggakanKeb = abs($selisihKebersihan);
+            } elseif ($selisihKebersihan == 0) {
+                $statusKeb = "Lunas";
+                $isKebLunas = true;
+                $tunggakanKeb = 0;
+            } else {
+                $statusKeb = "Lunas (Lebih {$selisihKebersihan} Bulan)";
+                $isKebLunas = true;
+                $tunggakanKeb = 0;
+            }
+
+            // Penentuan Status Iuran Satpam
+            if ($selisihSatpam < 0) {
+                $statusSat = "Nunggak " . abs($selisihSatpam) . " Bulan";
+                $isSatLunas = false;
+                $tunggakanSat = abs($selisihSatpam);
+            } elseif ($selisihSatpam == 0) {
+                $statusSat = "Lunas";
+                $isSatLunas = true;
+                $tunggakanSat = 0;
+            } else {
+                $statusSat = "Lunas (Lebih {$selisihSatpam} Bulan)";
+                $isSatLunas = true;
+                $tunggakanSat = 0;
+            }
 
             return [
                 'id' => $warga->id,
                 'nama' => $warga->nama,
                 'nomorRumah' => $nomorRumah,
                 'statusWarga' => $warga->status_warga,
-                'isKebersihanLunas' => $tunggakanKebersihan <= 0,
-                'isSatpamLunas' => $tunggakanSatpam <= 0,
-                'kebersihanStatus' => $tunggakanKebersihan <= 0 ? 'Lunas' : "Nunggak {$tunggakanKebersihan} Bulan",
-                'satpamStatus' => $tunggakanSatpam <= 0 ? 'Lunas' : "Nunggak {$tunggakanSatpam} Bulan",
+                'isKebersihanLunas' => $isKebLunas,
+                'isSatpamLunas' => $isSatLunas,
+                'kebersihanStatus' => $statusKeb,
+                'satpamStatus' => $statusSat,
                 'tunggakan' => [
-                    'kebersihan' => $tunggakanKebersihan,
-                    'satpam' => $tunggakanSatpam
+                    'kebersihan' => $tunggakanKeb,
+                    'satpam' => $tunggakanSat
                 ]
             ];
         });

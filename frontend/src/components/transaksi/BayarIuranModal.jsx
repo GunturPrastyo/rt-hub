@@ -16,8 +16,10 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
   const TARIF_SATPAM = 80000;
 
   const [selectedPenghuniId, setSelectedPenghuniId] = useState('');
-  const [bulanKebersihan, setBulanKebersihan] = useState(0);
-  const [bulanSatpam, setBulanSatpam] = useState(0);
+  
+  // LOGIKA BARU: State awal diatur sebagai string kosong ('') bukan 0
+  const [bulanKebersihan, setBulanKebersihan] = useState('');
+  const [bulanSatpam, setBulanSatpam] = useState('');
 
   // For searchable dropdown
   const [wargaSearchQuery, setWargaSearchQuery] = useState('');
@@ -35,17 +37,21 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     }
   }, [isOpen]);
 
-  // Reset payment months when resident changes
+  // LOGIKA BARU: Pengaturan otomatis jumlah bulan saat penghuni dipilih
   useEffect(() => {
-    setBulanKebersihan(selectedWarga?.tunggakan?.kebersihan > 0 ? selectedWarga.tunggakan.kebersihan : 1);
-    setBulanSatpam(selectedWarga?.tunggakan?.satpam > 0 ? selectedWarga.tunggakan.satpam : 1);
-    if (selectedWarga?.isKebersihanLunas) setBulanKebersihan(0);
-    if (selectedWarga?.isSatpamLunas) setBulanSatpam(0);
-    if (!selectedPenghuniId) {
-      setBulanKebersihan(0);
-      setBulanSatpam(0);
+    if (!selectedWarga) {
+      setBulanKebersihan('');
+      setBulanSatpam('');
+      return;
     }
-  }, [selectedPenghuniId, selectedWarga]);
+
+    const tunggakanKeb = selectedWarga.tunggakan?.kebersihan || 0;
+    const tunggakanSat = selectedWarga.tunggakan?.satpam || 0;
+
+    // Jika ada tunggakan, isi angka. Jika tidak ada tunggakan (lunas), biarkan kosong ('')
+    setBulanKebersihan(tunggakanKeb > 0 ? tunggakanKeb : '');
+    setBulanSatpam(tunggakanSat > 0 ? tunggakanSat : '');
+  }, [selectedWarga]);
 
   // Handle click outside for dropdown
   useEffect(() => {
@@ -67,12 +73,13 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
   const filteredAvailablePenghuni = availablePenghuni.filter(w => {
     const query = wargaSearchQuery.toLowerCase();
     const isSelected = selectedWarga && `${selectedWarga.nama} - Rumah ${selectedWarga.nomorRumah}` === wargaSearchQuery;
-    if (isSelected) return true; // Keep all if one is already selected and search text matches
+    if (isSelected) return true; 
     return w.nama.toLowerCase().includes(query) || w.nomorRumah.toLowerCase().includes(query);
   });
 
-  const totalKebersihan = bulanKebersihan * TARIF_KEBERSIHAN;
-  const totalSatpam = bulanSatpam * TARIF_SATPAM;
+  // LOGIKA BARU: Kalkulasi diubah, menambahkan fallback || 0 jika input kosong
+  const totalKebersihan = (Number(bulanKebersihan) || 0) * TARIF_KEBERSIHAN;
+  const totalSatpam = (Number(bulanSatpam) || 0) * TARIF_SATPAM;
   const grandTotal = totalKebersihan + totalSatpam;
 
   const handleLunasAkhirTahun = (type) => {
@@ -95,13 +102,13 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     e.preventDefault();
     if (!selectedWarga) return alert('Silakan pilih warga terlebih dahulu.');
     if (grandTotal <= 0) {
-      return alert('Total pembayaran adalah nol. Silakan pilih durasi pembayaran.');
+      return alert('Total pembayaran adalah nol. Silakan masukkan jumlah bulan yang ingin dibayar.');
     }
 
     onSubmit({
       penghuniId: selectedWarga.id,
-      bulanKebersihan,
-      bulanSatpam,
+      bulanKebersihan: Number(bulanKebersihan) || 0,
+      bulanSatpam: Number(bulanSatpam) || 0,
     });
   };
 
@@ -122,42 +129,42 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                 Pilih Warga / Penghuni
               </label>
               <div className="relative">
-            <Input
-              icon={HiMagnifyingGlass}
-              value={wargaSearchQuery}
-              onChange={(e) => {
-                setWargaSearchQuery(e.target.value);
-                if (selectedPenghuniId) setSelectedPenghuniId('');
-                if (!isWargaDropdownOpen) setIsWargaDropdownOpen(true);
-              }}
-              onFocus={() => setIsWargaDropdownOpen(true)}
-              placeholder="Cari nama atau nomor rumah..."
-              required
-            />
+                <Input
+                  icon={HiMagnifyingGlass}
+                  value={wargaSearchQuery}
+                  onChange={(e) => {
+                    setWargaSearchQuery(e.target.value);
+                    if (selectedPenghuniId) setSelectedPenghuniId('');
+                    if (!isWargaDropdownOpen) setIsWargaDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsWargaDropdownOpen(true)}
+                  placeholder="Cari nama atau nomor rumah..."
+                  required
+                />
                 <button type="button" onClick={() => setIsWargaDropdownOpen(!isWargaDropdownOpen)} className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <HiChevronDown className="h-5 w-5 text-gray-400" />
                 </button>
               </div>
 
               {isWargaDropdownOpen && (
-            <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-600 max-h-60 overflow-auto">
-              <ul className="py-1">
-                {filteredAvailablePenghuni.length > 0 ? filteredAvailablePenghuni.map((w) => (
-                  <li
-                    key={w.id}
-                    onClick={() => handleSelectWarga(w)}
-                    className="px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                  >
-                    {w.nama} - Rumah {w.nomorRumah}
-                    {(w.tunggakan.kebersihan > 0 || w.tunggakan.satpam > 0) && (
-                      <span className="ml-2 text-xs text-rose-500">(Ada Tunggakan)</span>
+                <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-600 max-h-60 overflow-auto">
+                  <ul className="py-1">
+                    {filteredAvailablePenghuni.length > 0 ? filteredAvailablePenghuni.map((w) => (
+                      <li
+                        key={w.id}
+                        onClick={() => handleSelectWarga(w)}
+                        className="px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                      >
+                        {w.nama} - Rumah {w.nomorRumah}
+                        {(w.tunggakan.kebersihan > 0 || w.tunggakan.satpam > 0) && (
+                          <span className="ml-2 text-xs text-rose-500">(Ada Tunggakan)</span>
+                        )}
+                      </li>
+                    )) : (
+                      <li className="px-4 py-2 text-sm text-slate-500">Warga tidak ditemukan.</li>
                     )}
-                  </li>
-                )) : (
-                  <li className="px-4 py-2 text-sm text-slate-500">Warga tidak ditemukan.</li>
-                )}
-              </ul>
-            </div>
+                  </ul>
+                </div>
               )}
             </div>
 
@@ -202,86 +209,88 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
             {selectedWarga ? (
               <div className="space-y-5 animate-fade-in">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Iuran Kebersihan Card */}
-              <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Kebersihan</h3>
-                  <span className="text-xs text-slate-400">Rp {TARIF_KEBERSIHAN.toLocaleString('id-ID')}/bln</span>
-                </div>
-                {selectedWarga.tunggakan.kebersihan > 0 && (
-                  <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
-                    Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.kebersihan} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                  {/* Iuran Kebersihan Card */}
+                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Kebersihan</h3>
+                      <span className="text-xs text-slate-400">Rp {TARIF_KEBERSIHAN.toLocaleString('id-ID')}/bln</span>
+                    </div>
+                    {selectedWarga.tunggakan.kebersihan > 0 && (
+                      <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
+                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.kebersihan} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+                        Total bulan yang ingin dibayar
+                      </label>
+                      {/* LOGIKA BARU: Input onChange memeriksa jika kosong ('') */}
+                      <Input
+                        type="number"
+                        value={bulanKebersihan}
+                        onChange={(e) => setBulanKebersihan(e.target.value === '' ? '' : Number(e.target.value))}
+                        min="0"
+                        placeholder="0"
+                      />
+                      <Button
+                        type="button"
+                        size="md"
+                        variant="secondary"
+                        onClick={() => handleLunasAkhirTahun('kebersihan')}
+                        className="mt-2 p-2 w-full text-xs"
+                      >
+                        Lunasi s/d Akhir Tahun
+                      </Button>
+                    </div>
+                    <div className="text-right pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
+                      <span className="text-xs text-slate-400 block">Subtotal Kebersihan:</span>
+                      <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                        Rp {totalKebersihan.toLocaleString('id-ID')}
+                      </span>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
-                    Total bulan yang ingin dibayar
-                  </label>
-                  <Input
-                    type="number"
-                    value={bulanKebersihan}
-                    onChange={(e) => setBulanKebersihan(Number(e.target.value))}
-                    min="0"
-                    placeholder="0"
-                  />
-                  <Button
-                    type="button"
-                    size="md"
-                    variant="secondary"
-                    onClick={() => handleLunasAkhirTahun('kebersihan')}
-                    className="mt-2 p-2"
-                  >
-                    Lunasi s/d Akhir Tahun
-                  </Button>
-                </div>
-                <div className="text-right pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
-                  <span className="text-xs text-slate-400 block">Subtotal Kebersihan:</span>
-                  <span className="text-base font-bold text-slate-800 dark:text-slate-100">
-                    Rp {totalKebersihan.toLocaleString('id-ID')}
-                  </span>
-                </div>
-              </div>
 
-              {/* Iuran Satpam Card */}
-              <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Satpam</h3>
-                  <span className="text-xs text-slate-400">Rp {TARIF_SATPAM.toLocaleString('id-ID')}/bln</span>
-                </div>
-                {selectedWarga.tunggakan.satpam > 0 && (
-                  <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
-                    Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.satpam} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                  {/* Iuran Satpam Card */}
+                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Satpam</h3>
+                      <span className="text-xs text-slate-400">Rp {TARIF_SATPAM.toLocaleString('id-ID')}/bln</span>
+                    </div>
+                    {selectedWarga.tunggakan.satpam > 0 && (
+                      <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
+                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.satpam} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+                        Total bulan yang ingin dibayar
+                      </label>
+                      {/* LOGIKA BARU: Input onChange memeriksa jika kosong ('') */}
+                      <Input
+                        type="number"
+                        value={bulanSatpam}
+                        onChange={(e) => setBulanSatpam(e.target.value === '' ? '' : Number(e.target.value))}
+                        min="0"
+                        placeholder="0"
+                      />
+                      <Button
+                        type="button"
+                        size="md"
+                        variant="secondary"
+                        onClick={() => handleLunasAkhirTahun('satpam')}
+                        className="mt-2 p-2 w-full text-xs"
+                      >
+                        Lunasi s/d Akhir Tahun
+                      </Button>
+                    </div>
+                    <div className="text-right pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
+                      <span className="text-xs text-slate-400 block">Subtotal Satpam:</span>
+                      <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                        Rp {totalSatpam.toLocaleString('id-ID')}
+                      </span>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
-                    Total bulan yang ingin dibayar
-                  </label>
-                  <Input
-                    type="number"
-                    value={bulanSatpam}
-                    onChange={(e) => setBulanSatpam(Number(e.target.value))}
-                    min="0"
-                    placeholder="0"
-                  />
-                  <Button
-                    type="button"
-                    size="md"
-                    variant="secondary"
-                    onClick={() => handleLunasAkhirTahun('satpam')}
-                    className="mt-2 p-2"
-                  >
-                    Lunasi s/d Akhir Tahun
-                  </Button>
                 </div>
-                <div className="text-right pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
-                  <span className="text-xs text-slate-400 block">Subtotal Satpam:</span>
-                  <span className="text-base font-bold text-slate-800 dark:text-slate-100">
-                    Rp {totalSatpam.toLocaleString('id-ID')}
-                  </span>
-                </div>
-              </div>
-            </div>
 
                 {/* Total Bayar */}
                 <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
