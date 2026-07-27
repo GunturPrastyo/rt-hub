@@ -17,4 +17,9 @@ class Penghuni extends Model
     {
         return $this->hasMany(Rumah::class, 'penghuni_id');
     }
+
+    public function currentRumah()
+    {
+        return $this->hasOne(Rumah::class, 'penghuni_id')->where('status', 'Dihuni');
+    }
 }
