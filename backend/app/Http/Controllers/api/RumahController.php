@@ -12,11 +12,21 @@ class RumahController extends Controller
 {
     public function __construct(protected RumahService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        
-        $rumah = Rumah::with(['penghuni', 'historiPenghuni.penghuni'])->latest()->get();
-        return RumahResource::collection($rumah);
+        $query = Rumah::with('penghuni')->latest();
+
+        if ($search = $request->query('search')) {
+            $query->where('nomor_rumah', 'like', "%{$search}%");
+        }
+
+        if ($status = $request->query('status')) {
+            if ($status !== 'Semua') {
+                $query->where('status', $status);
+            }
+        }
+
+        return RumahResource::collection($query->paginate(9));
     }
 
     public function store(Request $request)
@@ -29,7 +39,7 @@ class RumahController extends Controller
         ]);
 
         $rumah = $this->service->storeRumah($validated);
-        
+
         return response()->json([
             'success' => true,
             'data' => new RumahResource($rumah)
@@ -56,7 +66,7 @@ class RumahController extends Controller
     public function destroy(Rumah $rumah)
     {
         $this->service->deleteRumah($rumah);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Data rumah berhasil dihapus'
