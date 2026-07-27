@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('histori_penghuni', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('rumah_id')->constrained('Rumah')->cascadeOnDelete();
+            $table->foreignId('penghuni_id')->constrained('Penghuni')->cascadeOnDelete();
+
+            $table->date('tanggal_masuk');
+            $table->date('tanggal_keluar')->nullable(); 
+
             $table->timestamps();
         });
     }

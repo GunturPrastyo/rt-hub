@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import api from '../../services/api'; 
-import { 
-  HiOutlinePlus, 
-  HiMagnifyingGlass, 
-  HiOutlinePencilSquare, 
-  HiOutlineTrash, 
+import api from '../../services/api';
+import {
+  HiOutlinePlus,
+  HiMagnifyingGlass,
+  HiOutlinePencilSquare,
+  HiOutlineTrash,
   HiOutlineEye,
   HiOutlineUser,
   HiOutlineReceiptPercent
@@ -29,7 +29,7 @@ export default function RumahListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -51,11 +51,11 @@ export default function RumahListPage() {
   }, []);
 
   const filteredRumah = rumahList.filter((item) => {
-    const matchesSearch = 
+    const matchesSearch =
       item.nomorRumah.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.penghuniNama.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = 
+
+    const matchesStatus =
       statusFilter === 'Semua' ? true : item.status === statusFilter;
 
     return matchesSearch && matchesStatus;
@@ -94,7 +94,7 @@ export default function RumahListPage() {
   const handleFormSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-    
+
       const payload = {
         nomor_rumah: data.nomorRumah,
         status: data.status,
@@ -108,7 +108,7 @@ export default function RumahListPage() {
         await api.post('/rumah', payload);
       }
       setIsModalOpen(false);
-      fetchData(); 
+      fetchData();
     } catch (error) {
       console.error("Gagal menyimpan data rumah:", error);
       alert(error.response?.data?.message || "Terjadi kesalahan saat menyimpan data.");
@@ -145,11 +145,10 @@ export default function RumahListPage() {
               <button
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                  statusFilter === tab
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${statusFilter === tab
                     ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -250,6 +249,8 @@ export default function RumahListPage() {
         onSubmit={handleFormSubmit}
         initialData={selectedRumah}
         availablePenghuni={availablePenghuni}
+        rumahList={rumahList}
+        isSubmitting={isSubmitting}
       />
 
       <RumahDetailDrawer
