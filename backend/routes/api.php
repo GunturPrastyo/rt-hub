@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('penghuni', PenghuniController::class);
     Route::apiResource('rumah', RumahController::class);
+    Route::get('/summary', [PengeluaranController::class, 'summary']);
     Route::get('/pengeluaran', [PengeluaranController::class, 'index']);
     Route::post('/pengeluaran', [PengeluaranController::class, 'store']);
     Route::get('/iuran/status', [PemasukanController::class, 'statusIuran']);

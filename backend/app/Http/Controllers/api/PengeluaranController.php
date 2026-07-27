@@ -33,4 +33,14 @@ class PengeluaranController extends Controller
             'data' => new PengeluaranResource($pengeluaran)
         ], 201);
     }
+
+    public function summary()
+    {
+        $summary = $this->service->getSummary();
+
+        return response()->json([
+            'success' => true,
+            'data' => $summary
+        ]);
+    }
 }

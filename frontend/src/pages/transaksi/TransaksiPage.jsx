@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { HiOutlineArrowTrendingUp, HiOutlineArrowTrendingDown, HiOutlineScale } from 'react-icons/hi2';
+import api from '../../services/api';
 
-// Impor komponen tabel dari lokasi barunya di folder components/transaksi
 import PemasukanTable from '../../components/transaksi/PemasukanTable';
 import PengeluaranTable from '../../components/transaksi/PengeluaranTable';
 
-// Komponen Kartu Info yang dapat digunakan kembali
+
 const InfoCard = ({ title, value, icon: Icon, loading }) => (
   <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md flex items-center">
     <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
@@ -32,17 +32,8 @@ export default function TransaksiPage() {
     const fetchSummary = async () => {
       try {
         setLoading(true);
-        // TODO: Ganti dengan pemanggilan API backend Anda yang baru
-        // Misalnya: const response = await api.get('/api/transaksi/summary');
-        // setSummary(response.data);
-
-        // Data dummy untuk demonstrasi
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setSummary({
-          totalPemasukan: 15000000,
-          totalPengeluaran: 4500000,
-          sisaSaldo: 10500000,
-        });
+        const response = await api.get('/summary');
+        setSummary(response.data.data);
         setError(null);
       } catch (err) {
         setError('Gagal memuat ringkasan data.');

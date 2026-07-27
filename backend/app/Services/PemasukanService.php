@@ -103,4 +103,9 @@ class PemasukanService
             'tanggal_bayar' => Carbon::now()->toDateString()
         ]);
     }
+
+    public function getTotalPemasukan()
+    {
+        return Pemasukan::sum('total');
+    }
 }
