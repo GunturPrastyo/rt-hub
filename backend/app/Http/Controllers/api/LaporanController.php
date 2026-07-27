@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB; 
 
 class LaporanController extends Controller
 {
@@ -27,15 +28,41 @@ class LaporanController extends Controller
     {
         $page = $request->input('page', 1);
         $perPage = 10; 
-        $currentYear = Carbon::now()->year;
+        
+        // Tangkap parameter 'year' dari request, jika kosong gunakan tahun ini
+        $selectedYear = $request->input('year', Carbon::now()->year);
         $selectedPeriode = $request->input('periode'); 
 
-        // 1. Grafik Data (Yearly)
+        // 1. Ambil Opsi Tahun Dinamis dari Database (PERBAIKAN: Menggunakan Model)
+        $yearsPemasukan = Pemasukan::whereNotNull('tanggal_bayar')
+            ->selectRaw('YEAR(tanggal_bayar) as year')
+            ->distinct()
+            ->pluck('year')
+            ->toArray();
+
+        $yearsPengeluaran = Pengeluaran::whereNotNull('tanggal')
+            ->selectRaw('YEAR(tanggal) as year')
+            ->distinct()
+            ->pluck('year')
+            ->toArray();
+
+        // Gabungkan, hapus duplikat, dan urutkan menurun
+        $yearOptions = array_unique(array_merge($yearsPemasukan, $yearsPengeluaran));
+        rsort($yearOptions);
+
+        // Fallback jika database masih kosong sama sekali
+        if (empty($yearOptions)) {
+            $yearOptions = [Carbon::now()->year];
+        }
+
+        // 2. Grafik Data (Yearly berdasarkan $selectedYear)
         $grafik = [];
         for ($i = 1; $i <= 12; $i++) {
             $monthName = Carbon::create()->month($i)->translatedFormat('M');
-            $pemasukanBulanIni = $this->pemasukanService->getTotalPemasukanByMonthYear($i, $currentYear);
-            $pengeluaranBulanIni = $this->pengeluaranService->getTotalPengeluaranByMonthYear($i, $currentYear);
+            // Gunakan $selectedYear alih-alih $currentYear
+            $pemasukanBulanIni = $this->pemasukanService->getTotalPemasukanByMonthYear($i, $selectedYear);
+            $pengeluaranBulanIni = $this->pengeluaranService->getTotalPengeluaranByMonthYear($i, $selectedYear);
+            
             $grafik[] = [
                 'bulan' => $monthName,
                 'pemasukan' => (int) $pemasukanBulanIni,
@@ -43,7 +70,7 @@ class LaporanController extends Controller
             ];
         }
 
-        // 2. Mutasi Data (Monthly based on selectedPeriode)
+        // 3. Mutasi Data (Monthly based on selectedPeriode)
         $allMutasi = [];
         if ($selectedPeriode) {
             try {
@@ -93,7 +120,8 @@ class LaporanController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        $periodeOptions = $this->getAvailableFinancialPeriods();
+        // 4. Filter Opsi Periode khusus untuk Tahun yang sedang dipilih
+        $periodeOptions = $this->getAvailableFinancialPeriods($selectedYear);
 
         return response()->json([
             'success' => true,
@@ -101,14 +129,24 @@ class LaporanController extends Controller
                 'grafik' => $grafik,
                 'mutasi' => $paginatedMutasi,
                 'periodeOptions' => $periodeOptions,
+                'yearOptions' => $yearOptions, // Kirimkan opsi tahun ke frontend
             ]
         ]);
     }
 
-    private function getAvailableFinancialPeriods()
+    // Ubah fungsi ini agar menerima filter tahun
+    private function getAvailableFinancialPeriods($year)
     {
-        $pemasukanPeriods = Pemasukan::selectRaw('DISTINCT DATE_FORMAT(tanggal_bayar, "%Y-%m") as periode')->get()->pluck('periode');
-        $pengeluaranPeriods = Pengeluaran::selectRaw('DISTINCT DATE_FORMAT(tanggal, "%Y-%m") as periode')->get()->pluck('periode');
+        // Hanya ambil periode bulan pada tahun yang diminta
+        $pemasukanPeriods = Pemasukan::whereYear('tanggal_bayar', $year)
+            ->selectRaw('DISTINCT DATE_FORMAT(tanggal_bayar, "%Y-%m") as periode')
+            ->get()
+            ->pluck('periode');
+
+        $pengeluaranPeriods = Pengeluaran::whereYear('tanggal', $year)
+            ->selectRaw('DISTINCT DATE_FORMAT(tanggal, "%Y-%m") as periode')
+            ->get()
+            ->pluck('periode');
 
         $allPeriods = $pemasukanPeriods->merge($pengeluaranPeriods)->unique()->sortDesc();
 

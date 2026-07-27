@@ -135,6 +135,11 @@ class PemasukanService
         return Pemasukan::sum('total');
     }
 
+    public function getTotalPemasukanByYear(int $year)
+    {
+        return Pemasukan::whereYear('tanggal_bayar', $year)->sum('total');
+    }
+
     public function getTotalPemasukanByMonthYear(int $month, int $year)
     {
         return Pemasukan::whereYear('tanggal_bayar', $year)
