@@ -83,5 +83,8 @@ Anda akan langsung diarahkan ke Dashboard untuk mulai mengelola data RT
 
 ##  Screenshot Fitur Aplikasi
 
-**1. Halaman Dashboard & Grafik Keuangan**
-![Dashboard](screenshots/dashboard.png)
+**1. Halaman Dashboard**
+![Dashboard](docs/dashboard1.png)(docs/dashboard1.png)
+
+**1. Halaman Rumah**
+![Dashboard](docs/rumah1.png)(docs/rumah2.png)
