@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\KategoriPengeluaranController;
 use App\Http\Controllers\Api\LaporanController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PemasukanController;
 use App\Http\Controllers\Api\PengeluaranController;
 use App\Http\Controllers\Api\PenghuniController;
@@ -17,15 +18,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);  
 
 /*
 |--------------------------------------------------------------------------
-| Protected Routes (Authenticated RT/Admin)
+| Protected Routes (Wajib Login dengan Sanctum)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
-
-    // Auth
+    // Route Auth
+    Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('penghuni', PenghuniController::class);
@@ -41,7 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/iuran', [PemasukanController::class, 'store']);
     Route::get('/tarif-master', [PemasukanController::class, 'getTarifMaster']);
     Route::post('/tarif-master', [PemasukanController::class, 'updateTarifMaster']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/laporan/export', [LaporanController::class, 'exportMutasi']);
+    Route::get('/laporan/finansial', [LaporanController::class, 'finansial']);
 });
 
-// Laporan Finansial
-Route::middleware('auth:sanctum')->get('/laporan/finansial', [LaporanController::class, 'finansial']);
+
