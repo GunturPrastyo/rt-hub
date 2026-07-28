@@ -6,14 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pemasukan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('penghuni_id')->constrained('Penghuni')->cascadeOnDelete();
+            // Konvensi Laravel menggunakan huruf kecil untuk nama tabel di database
+            $table->foreignId('penghuni_id')->constrained('penghuni')->cascadeOnDelete();
+            
+            // TAMBAHAN: Transaksi harus tahu untuk rumah mana pembayaran ini dilakukan
+            $table->foreignId('rumah_id')->constrained('rumah')->cascadeOnDelete(); 
+            
             $table->integer('bulan_kebersihan')->default(0);
             $table->integer('bulan_satpam')->default(0);
             $table->integer('total');
@@ -22,9 +24,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pemasukan');

@@ -30,6 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('penghuni', PenghuniController::class);
     Route::apiResource('rumah', RumahController::class);
+    Route::get('/rumah/{rumah}', [RumahController::class, 'show']);
+    Route::get('/rumah/{rumah}/history-penghuni', [RumahController::class, 'historyPenghuni']); // Infinite scroll penghuni
+    Route::get('/rumah/{rumah}/history-pembayaran', [RumahController::class, 'historyPembayaran']); // Infinite scroll pembayaran
     Route::get('/summary', [PengeluaranController::class, 'summary']);
     Route::get('/pengeluaran', [PengeluaranController::class, 'index']);
     Route::post('/pengeluaran', [PengeluaranController::class, 'store']);

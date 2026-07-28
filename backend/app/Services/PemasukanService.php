@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class PemasukanService
 {
     public function calculateStatusIuran($perPage = 10, $search = null)
-    {   
+    {
         $currentDate = Carbon::now();
         $currentMonth = $currentDate->month;
         $currentYear = $currentDate->year;
@@ -19,11 +19,11 @@ class PemasukanService
         $query = Penghuni::whereHas('currentRumah')->with('currentRumah');
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhereHas('currentRumah', function($qr) use ($search) {
-                      $qr->where('nomor_rumah', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('currentRumah', function ($qr) use ($search) {
+                        $qr->where('nomor_rumah', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -38,9 +38,9 @@ class PemasukanService
             if ($warga->currentRumah) {
                 $nomorRumah = $warga->currentRumah->nomor_rumah;
                 $histori = HistoriPenghuni::where('rumah_id', $warga->currentRumah->id)
-                                          ->where('penghuni_id', $warga->id)
-                                          ->whereNull('tanggal_keluar')
-                                          ->first();
+                    ->where('penghuni_id', $warga->id)
+                    ->whereNull('tanggal_keluar')
+                    ->first();
                 if ($histori) {
                     $tanggalMasuk = Carbon::parse($histori->tanggal_masuk);
                 }
@@ -59,10 +59,10 @@ class PemasukanService
                     'tunggakan' => ['kebersihan' => 0, 'satpam' => 0]
                 ];
             }
-            
+
             $startMonthForCalculation = max($tanggalMasuk->month, 1);
             $startYearForCalculation = $tanggalMasuk->year;
-            
+
             if ($tanggalMasuk->year < $currentYear) {
                 $startMonthForCalculation = 1;
                 $startYearForCalculation = $currentYear;
@@ -74,12 +74,12 @@ class PemasukanService
             } else {
                 $expectedMonths = $currentMonth;
             }
-            
-            $expectedMonths = max(0, $expectedMonths); 
+
+            $expectedMonths = max(0, $expectedMonths);
 
             $totalBulanKebersihanPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_kebersihan');
             $totalBulanSatpamPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_satpam');
-            
+
             $selisihKebersihan = $totalBulanKebersihanPaid - $expectedMonths;
             $selisihSatpam = $totalBulanSatpamPaid - $expectedMonths;
 
@@ -135,8 +135,13 @@ class PemasukanService
     {
         $total = ($data['bulanKebersihan'] * 35000) + ($data['bulanSatpam'] * 80000);
 
+        // Cari tahu warga ini sekarang tinggal di rumah mana
+        $penghuni = Penghuni::with('currentRumah')->find($data['penghuniId']);
+        $rumahId = $penghuni->currentRumah->id ?? null;
+
         return Pemasukan::create([
             'penghuni_id' => $data['penghuniId'],
+            'rumah_id' => $rumahId, // Simpan rumah_id ke database
             'bulan_kebersihan' => $data['bulanKebersihan'],
             'bulan_satpam' => $data['bulanSatpam'],
             'total' => $total,
@@ -157,16 +162,16 @@ class PemasukanService
     public function getTotalPemasukanByMonthYear(int $month, int $year)
     {
         return Pemasukan::whereYear('tanggal_bayar', $year)
-                        ->whereMonth('tanggal_bayar', $month)
-                        ->sum('total');
+            ->whereMonth('tanggal_bayar', $month)
+            ->sum('total');
     }
 
     public function getMutasiPemasukanByMonthYear(int $month, int $year)
     {
         return Pemasukan::with('penghuni')
-                        ->whereYear('tanggal_bayar', $year)
-                        ->whereMonth('tanggal_bayar', $month)
-                        ->orderBy('tanggal_bayar', 'desc')
-                        ->get();
+            ->whereYear('tanggal_bayar', $year)
+            ->whereMonth('tanggal_bayar', $month)
+            ->orderBy('tanggal_bayar', 'desc')
+            ->get();
     }
 }
