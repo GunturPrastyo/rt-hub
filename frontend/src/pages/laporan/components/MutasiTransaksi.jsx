@@ -1,37 +1,82 @@
-import React from 'react';
-import { HiOutlineFunnel, HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
+import React, { useState } from 'react';
+import { HiOutlineFunnel, HiChevronLeft, HiChevronRight, HiOutlineDocumentArrowDown } from 'react-icons/hi2';
 import Badge from '../../../components/ui/Badge';
+import api from '../../../services/api';
 
 export default function MutasiTransaksi({
   mutasi,
   periodeOptions,
   selectedPeriode,
+  selectedYear, // Menerima parameter tahun dari parent
   onPeriodeChange,
-  pagination, // Terima props pagination
-  onPageChange, // Terima fungsi ganti halaman
+  pagination, 
+  onPageChange, 
   loading,
   formatCurrency,
 }) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Fungsi untuk hit API dan mendownload CSV
+  const handleExportCSV = async () => {
+    if (!selectedPeriode) return;
+    
+    setIsExporting(true);
+    try {
+      const response = await api.get('/laporan/export', {
+        params: { year: selectedYear, periode: selectedPeriode },
+        responseType: 'blob', // Penting untuk download file
+      });
+
+      // Bikin URL object dari blob response
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Laporan_Mutasi_RT_${selectedPeriode.replace(' ', '_')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Gagal mengekspor data:', error);
+      alert('Gagal mengekspor laporan.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Detail Mutasi Transaksi</h2>
-        <div className="flex items-center gap-2">
-          <HiOutlineFunnel className="w-4 h-4 text-slate-400" />
-          <select
-            value={selectedPeriode}
-            onChange={(e) => onPeriodeChange(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-slate-100"
-            disabled={loading || periodeOptions.length === 0}
+        
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Tombol Export Laporan */}
+          <button
+            onClick={handleExportCSV}
+            disabled={loading || isExporting || periodeOptions.length === 0}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            {periodeOptions.length > 0 ? (
-              periodeOptions.map((periode) => (
-                <option key={periode} value={periode}>Periode: {periode}</option>
-              ))
-            ) : (
-              <option value="">Tidak ada data</option>
-            )}
-          </select>
+            <HiOutlineDocumentArrowDown className="w-4 h-4" />
+            {isExporting ? 'Mengekspor...' : 'Ekspor CSV'}
+          </button>
+
+          {/* Filter Periode */}
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600">
+            <HiOutlineFunnel className="w-4 h-4 text-slate-400 ml-1" />
+            <select
+              value={selectedPeriode}
+              onChange={(e) => onPeriodeChange(e.target.value)}
+              className="bg-transparent border-none text-xs font-semibold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer p-0 pr-6"
+              disabled={loading || periodeOptions.length === 0}
+            >
+              {periodeOptions.length > 0 ? (
+                periodeOptions.map((periode) => (
+                  <option key={periode} value={periode}>{periode}</option>
+                ))
+              ) : (
+                <option value="">Tidak ada data</option>
+              )}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -71,22 +116,22 @@ export default function MutasiTransaksi({
       </div>
 
       {/* UI PAGINATION */}
-      {pagination && pagination.lastPage > 1 && (
+      {pagination && pagination.last_page > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
           <span className="text-xs text-slate-500">
             Menampilkan {pagination.from} - {pagination.to} dari {pagination.total} mutasi
           </span>
           <div className="flex gap-1">
             <button
-              onClick={() => onPageChange(pagination.currentPage - 1)}
-              disabled={pagination.currentPage === 1 || loading}
+              onClick={() => onPageChange(pagination.current_page - 1)}
+              disabled={pagination.current_page === 1 || loading}
               className="p-1.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
               <HiChevronLeft className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onPageChange(pagination.currentPage + 1)}
-              disabled={pagination.currentPage === pagination.lastPage || loading}
+              onClick={() => onPageChange(pagination.current_page + 1)}
+              disabled={pagination.current_page === pagination.last_page || loading}
               className="p-1.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50"
             >
               <HiChevronRight className="w-4 h-4" />
