@@ -14,32 +14,26 @@ class PenghuniController extends Controller
 
     public function index(Request $request)
     {
-        $query = Penghuni::with('rumah')->latest();
+        $penghuni = $this->service->getAllPenghuni(
+            $request->query('search'),
+            $request->query('status')
+        );
 
-        if ($search = $request->query('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('telepon', 'like', "%{$search}%");
-            });
-        }
-
-        if ($status = $request->query('status')) {
-            if ($status !== 'Semua') {
-                $query->where('status_warga', $status);
-            }
-        }
-
-        return PenghuniResource::collection($query->paginate(9));
+        return PenghuniResource::collection($penghuni);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama' => 'required|string',
-            'telepon' => 'required|string',
+            'telepon' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
             'status_warga' => 'required|in:Tetap,Kontrak',
             'status_pernikahan' => 'required|in:Menikah,Belum Menikah',
             'foto_ktp' => 'nullable|image|max:2048'
+        ], [
+            'telepon.regex' => 'Nomor telepon hanya boleh berisi angka.',
+            'telepon.min' => 'Nomor telepon minimal 10 digit.',
+            'telepon.max' => 'Nomor telepon maksimal 15 digit.',
         ]);
 
         $penghuni = $this->service->storePenghuni($validated, $request->file('foto_ktp'));
@@ -55,10 +49,14 @@ class PenghuniController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string',
-            'telepon' => 'required|string',
+            'telepon' => 'required|string|min:10|max:15|regex:/^[0-9]+$/',
             'status_warga' => 'required|in:Tetap,Kontrak',
             'status_pernikahan' => 'required|in:Menikah,Belum Menikah',
             'foto_ktp' => 'nullable|image|max:2048'
+        ], [
+            'telepon.regex' => 'Nomor telepon hanya boleh berisi angka.',
+            'telepon.min' => 'Nomor telepon minimal 10 digit.',
+            'telepon.max' => 'Nomor telepon maksimal 15 digit.',
         ]);
 
         $penghuni = $this->service->updatePenghuni($penghuni, $validated, $request->file('foto_ktp'));

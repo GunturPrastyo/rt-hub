@@ -124,6 +124,13 @@ export default function PenghuniFormModal({ isOpen, onClose, onSubmit, initialDa
               defaultValue={initialData?.telepon || ''}
               placeholder="081234567890"
               required
+              minLength={10}
+              maxLength={15}
+              onKeyPress={(e) => {
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
             />
 
             <div>

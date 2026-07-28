@@ -7,6 +7,24 @@ use Illuminate\Support\Facades\Storage;
 
 class PenghuniService
 {
+    public function getAllPenghuni(?string $search, ?string $status)
+    {
+        $query = Penghuni::with('rumah')->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('telepon', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status && $status !== 'Semua') {
+            $query->where('status_warga', $status);
+        }
+
+        return $query->paginate(9);
+    }
+
     public function storePenghuni(array $data, $file = null)
     {
         if ($file) {
@@ -18,7 +36,6 @@ class PenghuniService
     public function updatePenghuni(Penghuni $penghuni, array $data, $file = null)
     {
         if ($file) {
-            // Hapus KTP lama jika ada
             if ($penghuni->foto_ktp) {
                 Storage::disk('public')->delete($penghuni->foto_ktp);
             }
@@ -31,7 +48,6 @@ class PenghuniService
 
     public function deletePenghuni(Penghuni $penghuni)
     {
-       
         if ($penghuni->foto_ktp) {
             Storage::disk('public')->delete($penghuni->foto_ktp);
         }
