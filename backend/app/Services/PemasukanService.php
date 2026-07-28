@@ -9,15 +9,29 @@ use Carbon\Carbon;
 
 class PemasukanService
 {
-    public function calculateStatusIuran()
+    public function calculateStatusIuran($perPage = 10, $search = null)
     {   
         $currentDate = Carbon::now();
         $currentMonth = $currentDate->month;
         $currentYear = $currentDate->year;
 
-        $penghunis = Penghuni::whereHas('currentRumah')->with('currentRumah')->get();
+        // Gunakan Query Builder untuk pencarian
+        $query = Penghuni::whereHas('currentRumah')->with('currentRumah');
 
-        return $penghunis->map(function ($warga) use ($currentMonth, $currentYear) {
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhereHas('currentRumah', function($qr) use ($search) {
+                      $qr->where('nomor_rumah', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Terapkan Pagination
+        $penghunis = $query->paginate($perPage);
+
+        // Transformasi item di dalam koleksi paginasi
+        $penghunis->getCollection()->transform(function ($warga) use ($currentMonth, $currentYear) {
             $nomorRumah = '-';
             $tanggalMasuk = null;
 
@@ -66,11 +80,9 @@ class PemasukanService
             $totalBulanKebersihanPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_kebersihan');
             $totalBulanSatpamPaid = Pemasukan::where('penghuni_id', $warga->id)->sum('bulan_satpam');
             
-            // LOGIKA BARU: Menghitung selisih pembayaran
             $selisihKebersihan = $totalBulanKebersihanPaid - $expectedMonths;
             $selisihSatpam = $totalBulanSatpamPaid - $expectedMonths;
 
-            // Penentuan Status Iuran Kebersihan
             if ($selisihKebersihan < 0) {
                 $statusKeb = "Nunggak " . abs($selisihKebersihan) . " Bulan";
                 $isKebLunas = false;
@@ -85,7 +97,6 @@ class PemasukanService
                 $tunggakanKeb = 0;
             }
 
-            // Penentuan Status Iuran Satpam
             if ($selisihSatpam < 0) {
                 $statusSat = "Nunggak " . abs($selisihSatpam) . " Bulan";
                 $isSatLunas = false;
@@ -115,6 +126,9 @@ class PemasukanService
                 ]
             ];
         });
+
+        // Kembalikan objek Paginator
+        return $penghunis;
     }
 
     public function storePemasukan(array $data)

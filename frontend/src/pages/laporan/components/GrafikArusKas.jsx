@@ -1,7 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Custom Tooltip untuk styling yang lebih baik
 const CustomTooltip = ({ active, payload, label, formatCurrency }) => {
   if (active && payload && payload.length) {
     return (
@@ -15,8 +14,8 @@ const CustomTooltip = ({ active, payload, label, formatCurrency }) => {
   return null;
 };
 
-export default function GrafikArusKas({ grafik, formatCurrency }) {
-  // Formatter untuk label Sumbu Y (misal: 1000000 -> 1jt)
+// TERIMA PROPS: selectedYear
+export default function GrafikArusKas({ grafik, formatCurrency, selectedYear }) {
   const formatYAxis = (tick) => {
     if (tick >= 1000000) {
       return `${tick / 1000000}jt`;
@@ -31,7 +30,10 @@ export default function GrafikArusKas({ grafik, formatCurrency }) {
     <div className="p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Grafik Arus Kas (Tahun Ini)</h2>
+          {/* JUDUL DINAMIS */}
+          <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+            Grafik Arus Kas ({selectedYear})
+          </h2>
           <p className="text-xs text-slate-400">Visualisasi pemasukan vs pengeluaran per bulan.</p>
         </div>
       </div>

@@ -11,9 +11,11 @@ class PengeluaranController extends Controller
 {
     public function __construct(protected PengeluaranService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $pengeluarans = $this->service->getAllPengeluaran();
+        $search = $request->query('search');
+        $pengeluarans = $this->service->getAllPengeluaran(10, $search);
+        
         return PengeluaranResource::collection($pengeluarans);
     }
 

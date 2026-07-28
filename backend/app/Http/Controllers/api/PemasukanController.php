@@ -11,9 +11,15 @@ class PemasukanController extends Controller
 {
     public function __construct(protected PemasukanService $service) {}
 
-    public function statusIuran()
+    public function statusIuran(Request $request)
     {
-        $statusData = $this->service->calculateStatusIuran();
+        // Tangkap parameter pencarian dari frontend
+        $search = $request->query('search');
+        
+        // Panggil calculateStatusIuran dengan batasan 10 per halaman
+        $statusData = $this->service->calculateStatusIuran(10, $search);
+        
+        // Resource otomatis melampirkan metadata paginasi (current_page, total, dll)
         return IuranStatusResource::collection($statusData);
     }
 

@@ -28,9 +28,19 @@ class PengeluaranService
         return $totalPemasukan - $totalPengeluaran;
     }
 
-    public function getAllPengeluaran()
+    // UPDATE: Tambahkan parameter paginate dan pencarian
+    public function getAllPengeluaran($perPage = 10, $search = null)
     {
-        return Pengeluaran::latest()->get();
+        $query = Pengeluaran::latest();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('keterangan', 'like', "%{$search}%")
+                  ->orWhere('kategori', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function storePengeluaran(array $data)

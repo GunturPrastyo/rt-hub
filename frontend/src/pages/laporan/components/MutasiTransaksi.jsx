@@ -1,5 +1,5 @@
 import React from 'react';
-import { HiOutlineFunnel } from 'react-icons/hi2';
+import { HiOutlineFunnel, HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
 import Badge from '../../../components/ui/Badge';
 
 export default function MutasiTransaksi({
@@ -7,12 +7,14 @@ export default function MutasiTransaksi({
   periodeOptions,
   selectedPeriode,
   onPeriodeChange,
+  pagination, // Terima props pagination
+  onPageChange, // Terima fungsi ganti halaman
   loading,
   formatCurrency,
 }) {
   return (
     <div className="p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Detail Mutasi Transaksi</h2>
         <div className="flex items-center gap-2">
           <HiOutlineFunnel className="w-4 h-4 text-slate-400" />
@@ -22,9 +24,13 @@ export default function MutasiTransaksi({
             className="px-3 py-1.5 text-xs font-semibold bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-slate-100"
             disabled={loading || periodeOptions.length === 0}
           >
-            {periodeOptions.map((periode) => (
-              <option key={periode} value={periode}>Periode: {periode}</option>
-            ))}
+            {periodeOptions.length > 0 ? (
+              periodeOptions.map((periode) => (
+                <option key={periode} value={periode}>Periode: {periode}</option>
+              ))
+            ) : (
+              <option value="">Tidak ada data</option>
+            )}
           </select>
         </div>
       </div>
@@ -63,6 +69,31 @@ export default function MutasiTransaksi({
           </tbody>
         </table>
       </div>
+
+      {/* UI PAGINATION */}
+      {pagination && pagination.lastPage > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+          <span className="text-xs text-slate-500">
+            Menampilkan {pagination.from} - {pagination.to} dari {pagination.total} mutasi
+          </span>
+          <div className="flex gap-1">
+            <button
+              onClick={() => onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1 || loading}
+              className="p-1.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50"
+            >
+              <HiChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onPageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.lastPage || loading}
+              className="p-1.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-50"
+            >
+              <HiChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
