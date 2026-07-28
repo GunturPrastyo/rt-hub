@@ -1,28 +1,26 @@
-import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
 export default function MainLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100">
-      {/* Sidebar Component */}
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
-      />
+    // Tambahkan pb-20 (padding-bottom) khusus mobile agar konten halaman tidak tertutup Bottom Nav
+    <div className="min-h-screen bg-slate-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 pb-20 lg:pb-0">
+      
+      {/* Komponen Sidebar & Bottom Nav */}
+      <Sidebar />
 
-      {/* Main Content Area */}
-      <div className={`flex flex-col transition-all duration-300 ${isSidebarOpen ? 'lg:pl-64' : 'pl-0'}`}>
-        {/* Navbar Component */}
-        <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      {/* Konten Utama (Bergeser ke kanan 64px hanya di Desktop) */}
+      <div className="flex flex-col transition-all duration-300 lg:pl-64">
+        
+        {/* Navbar Tanpa Hamburger */}
+        <Navbar />
 
-        {/* Dynamic Page Content */}
-        <main className="flex-1 p-6">
+        {/* Area Halaman Dinamis */}
+        <main className="flex-1 p-4 sm:p-6">
           <Outlet />
         </main>
+        
       </div>
     </div>
   );
