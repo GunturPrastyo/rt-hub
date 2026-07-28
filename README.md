@@ -84,7 +84,28 @@ Anda akan langsung diarahkan ke Dashboard untuk mulai mengelola data RT
 ##  Screenshot Fitur Aplikasi
 
 **1. Halaman Dashboard**
-![Dashboard](docs/dashboard1.png)(docs/dashboard1.png)
+![Dashboard 1](docs/dashboard1.png)
+![Dashboard 2](docs/dashboard2.png)
 
-**1. Halaman Rumah**
-![Dashboard](docs/rumah1.png)(docs/rumah2.png)
+**2. Halaman Rumah**
+![Rumah 1](docs/rumah1.png)
+![Rumah 2](docs/rumah2.png)
+![Rumah 3](docs/rumah3.png)
+
+**3. Halaman Penghuni**
+![Penghuni 1](docs/penghuni1.png)
+![Penghuni 2](docs/penghuni2.png)
+
+
+**4. Halaman Pemasukan**
+![Pemasukan 1](docs/pemasukan1.png)
+![Pemasukan 2](docs/pemasukan2.png)
+![Pemasukan 3](docs/pemasukan3.png)
+
+
+**5. Halaman Pengeluaran**
+![Pengeluaran 1](docs/pengeluaran1.png)
+![Pengeluaran 2](docs/pengeluaran2.png)
+
+**5. Halaman Laporan**
+![laporan](docs/laporan.png)
