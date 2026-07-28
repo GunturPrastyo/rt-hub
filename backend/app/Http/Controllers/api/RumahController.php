@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Rumah;
-use App\Http\Resources\RumahResource;
 use App\Http\Resources\RumahDetailResource;
+use App\Http\Resources\RumahResource;
+use App\Models\Rumah;
 use App\Services\RumahService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RumahController extends Controller
@@ -55,8 +56,8 @@ class RumahController extends Controller
             return [
                 'id' => $histori->id,
                 'nama' => $histori->penghuni->nama ?? 'Tidak Diketahui',
-                'periodeMasuk' => \Carbon\Carbon::parse($histori->tanggal_masuk)->translatedFormat('d M Y'),
-                'periodeKeluar' => $histori->tanggal_keluar ? \Carbon\Carbon::parse($histori->tanggal_keluar)->translatedFormat('d M Y') : null,
+                'periodeMasuk' => Carbon::parse($histori->tanggal_masuk)->translatedFormat('d M Y'),
+                'periodeKeluar' => $histori->tanggal_keluar ? Carbon::parse($histori->tanggal_keluar)->translatedFormat('d M Y') : null,
                 'statusKontrak' => $histori->tanggal_keluar ? 'Selesai' : 'Aktif',
             ];
         });
@@ -67,14 +68,24 @@ class RumahController extends Controller
     public function historyPembayaran(Rumah $rumah, Request $request)
     {
         $paginator = $this->service->getHistoryPembayaranPaginated($rumah, 10);
-
+        
         $paginator->getCollection()->transform(function ($pay) {
+            // Buat rincian teks atau objek detail
+            $rincianArray = [];
+            if ($pay->bulan_kebersihan > 0) {
+                $rincianArray[] = "Kebersihan ({$pay->bulan_kebersihan} bln)";
+            }
+            if ($pay->bulan_satpam > 0) {
+                $rincianArray[] = "Satpam ({$pay->bulan_satpam} bln)";
+            }
+
             return [
                 'id' => $pay->id,
-                'status' => 'Lunas',
-                'bulan' => \Carbon\Carbon::parse($pay->tanggal_bayar)->translatedFormat('M Y'),
+                'status' => 'Lunas', 
+                'bulan' => Carbon::parse($pay->tanggal_bayar)->translatedFormat('d M Y'), // Menampilkan tanggal bayar lebih spesifik
                 'penghuniSaatItu' => $pay->penghuni->nama ?? '-',
                 'nominal' => $pay->total,
+                'rincian' => implode(' • ', $rincianArray) // Contoh hasil: "Kebersihan (1 bln) • Satpam (1 bln)"
             ];
         });
 
