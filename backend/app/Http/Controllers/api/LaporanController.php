@@ -82,6 +82,8 @@ class LaporanController extends Controller
                         'kategori' => 'Iuran', 
                         'keterangan' => 'Pembayaran Iuran ' . $p->penghuni->nama . ' (' . $p->bulan_kebersihan . ' Kebersihan, ' . $p->bulan_satpam . ' Satpam)',
                         'nominal' => (int) $p->total,
+                       
+                        'created_at' => Carbon::parse($p->created_at)->toDateTimeString(),
                         'tanggal' => Carbon::parse($p->tanggal_bayar)->toDateString(),
                     ];
                 }
@@ -93,13 +95,16 @@ class LaporanController extends Controller
                         'kategori' => $pe->kategori,
                         'keterangan' => $pe->keterangan,
                         'nominal' => (int) $pe->nominal,
+                      
+                        'created_at' => Carbon::parse($pe->created_at)->toDateTimeString(),
                         'tanggal' => Carbon::parse($pe->tanggal)->toDateString(),
                     ];
                 }
 
                 usort($allMutasi, function($a, $b) {
-                    return strtotime($b['tanggal']) - strtotime($a['tanggal']);
+                    return strtotime($b['created_at']) - strtotime($a['created_at']);
                 });
+
             } catch (\Exception $e) {
                 Log::error("Invalid periode format received: " . $selectedPeriode . " Error: " . $e->getMessage());
             }
@@ -174,6 +179,7 @@ class LaporanController extends Controller
                         'kategori' => 'Iuran', 
                         'keterangan' => 'Pembayaran Iuran ' . $p->penghuni->nama . ' (' . $p->bulan_kebersihan . ' Kebersihan, ' . $p->bulan_satpam . ' Satpam)',
                         'nominal' => $nominal, 
+                        'created_at' => Carbon::parse($p->created_at)->toDateTimeString(),
                     ];
                 }
 
@@ -187,11 +193,12 @@ class LaporanController extends Controller
                         'kategori' => $pe->kategori,
                         'keterangan' => $pe->keterangan,
                         'nominal' => -$nominal, 
+                        'created_at' => Carbon::parse($pe->created_at)->toDateTimeString(),
                     ];
                 }
 
                 usort($allMutasi, function($a, $b) {
-                    return strtotime($b['tanggal']) - strtotime($a['tanggal']);
+                    return strtotime($b['created_at']) - strtotime($a['created_at']);
                 });
             } catch (\Exception $e) {
                 Log::error("Export Error: " . $e->getMessage());

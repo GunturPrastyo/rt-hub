@@ -77,3 +77,11 @@ Klik Daftar Sekarang untuk membuat akun Administrator baru.
 Setelah berhasil mendaftar, lakukan Login menggunakan Email dan Password tersebut.
 
 Anda akan langsung diarahkan ke Dashboard untuk mulai mengelola data RT
+
+## 🗄️ Entity Relationship Diagram (ERD)
+![ERD Aplikasi](docs/ERD_RTHub.jpg)
+
+##  Screenshot Fitur Aplikasi
+
+**1. Halaman Dashboard & Grafik Keuangan**
+![Dashboard](screenshots/dashboard.png)

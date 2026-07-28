@@ -41,6 +41,13 @@ export default function MutasiTransaksi({
     }
   };
 
+  // 1. TAMBAHAN: Mengurutkan mutasi berdasarkan waktu penginputan (created_at atau tanggal) dari yang terbaru
+  const sortedMutasi = [...mutasi].sort((a, b) => {
+    const timeA = new Date(a.created_at || a.tanggal).getTime();
+    const timeB = new Date(b.created_at || b.tanggal).getTime();
+    return timeB - timeA; 
+  });
+
   return (
     <div className="p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 shadow-sm space-y-4">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -92,8 +99,9 @@ export default function MutasiTransaksi({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
             {loading ? (
               <tr><td colSpan="5" className="text-center py-8 text-slate-400">Memuat data mutasi...</td></tr>
-            ) : mutasi.length > 0 ? (
-              mutasi.map((item) => (
+            ) : sortedMutasi.length > 0 ? (
+              // 2. UBAH: Gunakan sortedMutasi hasil sorting di atas
+              sortedMutasi.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                   <td className="px-4 py-3 text-slate-500">{item.tanggal}</td>
                   <td className="px-4 py-3">

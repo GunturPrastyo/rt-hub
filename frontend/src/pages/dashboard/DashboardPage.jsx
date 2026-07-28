@@ -76,14 +76,20 @@ export default function DashboardPage() {
         const laporanData = laporanRes.data.data;
         setFinancialData(laporanData.grafik || []);
 
-        const latestPeriode = laporanData.periodeOptions?.[0];
+       const latestPeriode = laporanData.periodeOptions?.[0];
         if (latestPeriode) {
            const mutasiRes = await api.get('/laporan/finansial', { 
              params: { year: currentYear, periode: latestPeriode } 
            });
            const mutasiList = mutasiRes.data.data.mutasi.data || [];
-           // PERUBAHAN: Membatasi mutasi hanya 4 data teratas
-           setRecentTransactions(mutasiList.slice(0, 4)); 
+
+           const sortedMutasiList = [...mutasiList].sort((a, b) => {
+             const timeA = new Date(a.created_at || a.tanggal).getTime();
+             const timeB = new Date(b.created_at || b.tanggal).getTime();
+             return timeB - timeA;
+           });
+           
+           setRecentTransactions(sortedMutasiList.slice(0, 4)); 
         }
 
       } catch (error) {
