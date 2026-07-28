@@ -6,16 +6,16 @@ import PemasukanTable from '../../components/transaksi/PemasukanTable';
 import PengeluaranTable from '../../components/transaksi/PengeluaranTable';
 
 const InfoCard = ({ title, value, icon: Icon, loading }) => (
-  <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md flex items-center">
-    <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
-      <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+  <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md flex items-center gap-2">
+    <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full mr-4">
+      <Icon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
     </div>
     <div>
       <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
       {loading ? (
         <div className="mt-1 h-7 w-32 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
       ) : (
-        <p className="text-2xl font-bold text-gray-800 dark:text-white">{value}</p>
+        <p className="text-xl font-bold text-gray-800 dark:text-white">{value}</p>
       )}
     </div>
   </div>
