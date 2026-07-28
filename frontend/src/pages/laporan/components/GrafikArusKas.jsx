@@ -55,11 +55,10 @@ export default function GrafikArusKas({ grafik, formatCurrency, selectedYear, ye
             <Tooltip
               formatter={(value) => [formatCurrency(value)]}
               contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', border: 'none', color: '#fff', fontSize: '12px' }}
-              cursor={{ fill: '#f1f5f9', opacity: 0.1 }} // Memberikan highlight tipis pada background saat di-hover
+              cursor={{ fill: '#f1f5f9', opacity: 0.1 }} 
             />
             <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '12px' }} />
-            
-            {/* Dikembalikan menggunakan Bar Chart dengan sudut membulat di atas (radius) */}
+          
             <Bar 
               dataKey="pemasukan" 
               name="Pemasukan (Iuran)" 

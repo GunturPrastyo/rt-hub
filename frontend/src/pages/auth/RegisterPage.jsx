@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import api from '../../services/api';
 import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineUser, HiOutlineUserPlus } from 'react-icons/hi2';
-import ToastNotification from '../../components/ui/ToastNotification'; // <-- Import Toast Notification
+import ToastNotification from '../../components/ui/ToastNotification'; 
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -15,7 +15,6 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // State untuk Toast Notification
   const [toast, setToast] = useState({ message: '', type: 'info', isVisible: false });
 
   const navigate = useNavigate();
@@ -45,19 +44,17 @@ export default function RegisterPage() {
 
     try {
       await api.post('/register', formData);
-      
-      // Munculkan Toast Sukses
+    
       showToast('Registrasi berhasil! Mengalihkan ke halaman login...', 'success');
       
-      // Beri jeda 2.5 detik agar user bisa membaca toast sebelum dialihkan
       setTimeout(() => {
         navigate('/login');
-      }, 2500);
+      }, 1500);
 
     } catch (err) {
       const message = err.response?.data?.message || 'Registrasi gagal. Silakan periksa kembali data Anda.';
       setError(message);
-      setIsSubmitting(false); // Matikan loading hanya jika error (jika sukses biarkan loading sampai redirect)
+      setIsSubmitting(false); 
     } 
   };
 
@@ -245,7 +242,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Render Toast Notification */}
       <ToastNotification
         message={toast.message}
         type={toast.type}

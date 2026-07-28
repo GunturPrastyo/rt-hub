@@ -20,19 +20,16 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
   const [bulanKebersihan, setBulanKebersihan] = useState('');
   const [bulanSatpam, setBulanSatpam] = useState('');
 
-  // State Tarif Master dari Database
   const [tarifKebersihan, setTarifKebersihan] = useState(35000);
   const [tarifSatpam, setTarifSatpam] = useState(80000);
   const [isEditingTarif, setIsEditingTarif] = useState(false);
 
-  // For searchable dropdown
   const [wargaSearchQuery, setWargaSearchQuery] = useState('');
   const [isWargaDropdownOpen, setIsWargaDropdownOpen] = useState(false);
   const searchRef = useRef(null);
 
   const selectedWarga = availablePenghuni.find((p) => String(p.id) === String(selectedPenghuniId));
 
-  // Ambil data tarif master terbaru dari Database saat modal dibuka
   useEffect(() => {
     if (isOpen) {
       api.get('/tarif-master')
@@ -51,7 +48,6 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     }
   }, [isOpen]);
 
-  // Pengaturan otomatis jumlah bulan saat penghuni dipilih
   useEffect(() => {
     if (!selectedWarga) {
       setBulanKebersihan('');
@@ -66,7 +62,6 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     setBulanSatpam(tunggakanSat > 0 ? tunggakanSat : '');
   }, [selectedWarga]);
 
-  // Handle click outside for dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -90,7 +85,6 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     return w.nama.toLowerCase().includes(query) || w.nomorRumah.toLowerCase().includes(query);
   });
 
-  // Simpan perubahan tarif master secara permanen ke Database
   const handleSaveTarifMaster = async () => {
     try {
       const response = await api.post('/tarif-master', {
@@ -108,7 +102,6 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     }
   };
 
-  // Kalkulasi total berdasarkan tarif master
   const totalKebersihan = (Number(bulanKebersihan) || 0) * (Number(tarifKebersihan) || 0);
   const totalSatpam = (Number(bulanSatpam) || 0) * (Number(tarifSatpam) || 0);
   const grandTotal = totalKebersihan + totalSatpam;

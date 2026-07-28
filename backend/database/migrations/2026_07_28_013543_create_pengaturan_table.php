@@ -16,7 +16,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Masukkan data default awal agar sistem langsung siap pakai
         DB::table('pengaturan')->insert([
             ['key' => 'tarif_kebersihan', 'value' => '35000', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'tarif_satpam', 'value' => '80000', 'created_at' => now(), 'updated_at' => now()],

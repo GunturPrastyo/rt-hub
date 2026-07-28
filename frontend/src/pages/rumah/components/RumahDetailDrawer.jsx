@@ -13,17 +13,14 @@ import {
 export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
   const [activeTab, setActiveTab] = useState('historyPenghuni');
 
-  // State Info Dasar
   const [detailData, setDetailData] = useState(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-  // State Infinite Scroll Penghuni
   const [penghuniData, setPenghuniData] = useState([]);
   const [penghuniPage, setPenghuniPage] = useState(1);
   const [hasMorePenghuni, setHasMorePenghuni] = useState(true);
   const [isPenghuniLoading, setIsPenghuniLoading] = useState(false);
 
-  // State Infinite Scroll Pembayaran
   const [pembayaranData, setPembayaranData] = useState([]);
   const [pembayaranPage, setPembayaranPage] = useState(1);
   const [hasMorePembayaran, setHasMorePembayaran] = useState(true);
@@ -31,7 +28,6 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
 
   const scrollRef = useRef(null);
 
-  // Reset State saat Drawer dibuka/ditutup
   useEffect(() => {
     if (isOpen && rumah?.id) {
       fetchDetail();
@@ -45,7 +41,7 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
     }
   }, [isOpen, rumah]);
 
-  // Fetch Info Dasar Rumah
+
   const fetchDetail = async () => {
     setIsDetailLoading(true);
     try {
@@ -58,7 +54,6 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
     }
   };
 
-  // Fetch Riwayat Penghuni
   useEffect(() => {
     if (!isOpen || !rumah?.id) return;
 
@@ -80,7 +75,6 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
     fetchPenghuni();
   }, [penghuniPage, isOpen, rumah]);
 
-  // Fetch Riwayat Pembayaran
   useEffect(() => {
     if (!isOpen || !rumah?.id) return;
 
@@ -102,12 +96,11 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
     fetchPembayaran();
   }, [pembayaranPage, isOpen, rumah]);
 
-  // Fungsi Deteksi Scroll Mentok (Infinite Scroll Soft)
+
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, clientHeight, scrollHeight } = scrollRef.current;
 
-    // Jika jarak scroll dengan bagian bawah kurang dari 50px, fetch data baru
     if (scrollHeight - scrollTop <= clientHeight + 50) {
       if (activeTab === 'historyPenghuni' && hasMorePenghuni && !isPenghuniLoading) {
         setPenghuniPage(prev => prev + 1);
@@ -211,7 +204,6 @@ export default function RumahDetailDrawer({ isOpen, onClose, rumah }) {
               </>
             )}
 
-            {/* TAB: HISTORY PEMBAYARAN */}
             {/* TAB: HISTORY PEMBAYARAN */}
             {activeTab === 'historyPembayaran' && (
               <>

@@ -16,7 +16,6 @@ class PenghuniController extends Controller
     {
         $query = Penghuni::with('rumah')->latest();
 
-        // Filter berdasarkan pencarian nama atau telepon
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
@@ -24,14 +23,12 @@ class PenghuniController extends Controller
             });
         }
 
-        // Filter berdasarkan status warga (Tetap/Kontrak)
         if ($status = $request->query('status')) {
             if ($status !== 'Semua') {
                 $query->where('status_warga', $status);
             }
         }
 
-        // Gunakan paginate() dengan menampilkan 9 data per halaman (pas untuk desain grid 3 kolom)
         return PenghuniResource::collection($query->paginate(9));
     }
 

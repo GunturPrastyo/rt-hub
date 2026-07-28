@@ -270,7 +270,6 @@ export default function DashboardPage() {
                     contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', border: 'none', color: '#fff', fontSize: '12px' }}
                   />
                   <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '12px' }} />
-                  {/* type="monotone" membuat garisnya melengkung halus (smooth) */}
                   <Area type="monotone" dataKey="pemasukan" name="Pemasukan (Iuran)" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorPemasukan)" />
                   <Area type="monotone" dataKey="pengeluaran" name="Pengeluaran RT" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorPengeluaran)" />
                 </AreaChart>

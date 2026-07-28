@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; // <-- Tambahkan import ini untuk enkripsi password
+use Illuminate\Support\Facades\Hash; 
 use App\Models\User;
 use Laravel\Sanctum\PersonalAccessToken; 
 
@@ -15,22 +15,19 @@ class AuthController extends Controller
      * Register User Baru
      */
     public function register(Request $request)
-    {
-        // 1. Validasi input dari frontend
+    {  
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users', // Pastikan email belum terdaftar
-            'password' => 'required|string|min:8|confirmed', // Harus cocok dengan password_confirmation
+            'email'    => 'required|string|email|max:255|unique:users', 
+            'password' => 'required|string|min:8|confirmed', 
         ]);
 
-        // 2. Buat user baru ke database
         $user = User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']), // Enkripsi password
+            'password' => Hash::make($validated['password']), 
         ]);
 
-        // 3. Kembalikan response sukses
         return response()->json([
             'success' => true,
             'message' => 'Registrasi berhasil. Silakan login.',
@@ -49,8 +46,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            // Karena di kodinganmu menggunakan custom jsonResponse, pastikan metode itu ada di Controller utama (Base Controller).
-            // Jika tidak ada, gunakan return response()->json(...) seperti pada fungsi register di atas.
+         
             return $this->jsonResponse(
                 success: false,
                 message: 'Email atau password salah.',

@@ -11,19 +11,16 @@ class RumahService
 {
     public function getDetailRumah(Rumah $rumah)
     {
-        // 1. Eager load data penghuni saat ini dan histori penghuni sebelumnya
+       
         $rumah->load(['penghuni', 'historiPenghuni.penghuni']);
 
-        // 2. Kumpulkan ID penghuni yang pernah menempati rumah ini
         $penghuniIds = $rumah->historiPenghuni->pluck('penghuni_id')->filter()->unique();
 
-        // 3. Tarik data pembayaran iuran khusus untuk penghuni-penghuni tersebut
         $pemasukan = Pemasukan::with('penghuni')
             ->whereIn('penghuni_id', $penghuniIds)
             ->orderBy('tanggal_bayar', 'desc')
             ->get();
 
-        // Kembalikan array berisi instance Rumah dan koleksi Pemasukan
         return [
             'rumah' => $rumah,
             'pemasukan' => $pemasukan
@@ -75,7 +72,6 @@ class RumahService
 
     public function getHistoryPenghuniPaginated(Rumah $rumah, $perPage = 5)
     {
-        // Relasi historiPenghuni sudah diurutkan desc di model
         return $rumah->historiPenghuni()->with('penghuni')->paginate($perPage);
     }
 

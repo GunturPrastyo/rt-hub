@@ -14,13 +14,11 @@ class PemasukanController extends Controller
 
     public function statusIuran(Request $request)
     {
-        // Tangkap parameter pencarian dari frontend
+     
         $search = $request->query('search');
 
-        // Panggil calculateStatusIuran dengan batasan 10 per halaman
         $statusData = $this->service->calculateStatusIuran(10, $search);
 
-        // Resource otomatis melampirkan metadata paginasi (current_page, total, dll)
         return IuranStatusResource::collection($statusData);
     }
 
@@ -30,8 +28,8 @@ class PemasukanController extends Controller
             'penghuniId' => 'required|exists:penghuni,id',
             'bulanKebersihan' => 'required|numeric|min:0',
             'bulanSatpam' => 'required|numeric|min:0',
-            'tarifKebersihan' => 'nullable|numeric|min:0', // <-- Validasi baru
-            'tarifSatpam' => 'nullable|numeric|min:0',     // <-- Validasi baru
+            'tarifKebersihan' => 'nullable|numeric|min:0', 
+            'tarifSatpam' => 'nullable|numeric|min:0',     
         ]);
 
         $this->service->storePemasukan($validated);
@@ -43,9 +41,6 @@ class PemasukanController extends Controller
     }
 
 
-
-
-    // Method untuk mengambil tarif master yang aktif
     public function getTarifMaster()
     {
         $tarifKebersihan = Pengaturan::where('key', 'tarif_kebersihan')->value('value') ?? 35000;
@@ -58,7 +53,6 @@ class PemasukanController extends Controller
         ]);
     }
 
-    // Method untuk menyimpan/mengupdate tarif master secara permanen
     public function updateTarifMaster(Request $request)
     {
         $validated = $request->validate([

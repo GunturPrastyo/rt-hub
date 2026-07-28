@@ -13,8 +13,7 @@ class Pemasukan extends Model
     {
         return $this->belongsTo(Penghuni::class, 'penghuni_id');
     }
-
-    // Tambahkan relasi ke tabel rumah
+    
     public function rumah()
     {
         return $this->belongsTo(Rumah::class, 'rumah_id');

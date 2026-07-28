@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 
 export default function MainLayout() {
   return (
-    // Tambahkan pb-20 (padding-bottom) khusus mobile agar konten halaman tidak tertutup Bottom Nav
+    
     <div className="min-h-screen bg-slate-50 text-gray-800 dark:bg-slate-900 dark:text-gray-100 pb-20 lg:pb-0">
       
       {/* Komponen Sidebar & Bottom Nav */}

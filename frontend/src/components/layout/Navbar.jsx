@@ -40,8 +40,7 @@ export default function Navbar() {
 
       {/* Sisi Kanan: Theme Toggle (Hanya Desktop), Notifications, User Profile */}
       <div className="flex items-center gap-3 shrink-0">
-        
-        {/* Tombol ini disembunyikan di resolusi Mobile (menambahkan kelas: hidden md:block) */}
+
         <button
           onClick={toggleDarkMode}
           className="hidden md:block p-2.5 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors focus:outline-none cursor-pointer"

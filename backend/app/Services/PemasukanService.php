@@ -15,7 +15,6 @@ class PemasukanService
         $currentMonth = $currentDate->month;
         $currentYear = $currentDate->year;
 
-        // Gunakan Query Builder untuk pencarian
         $query = Penghuni::whereHas('currentRumah')->with('currentRumah');
 
         if ($search) {
@@ -27,10 +26,8 @@ class PemasukanService
             });
         }
 
-        // Terapkan Pagination
         $penghunis = $query->paginate($perPage);
 
-        // Transformasi item di dalam koleksi paginasi
         $penghunis->getCollection()->transform(function ($warga) use ($currentMonth, $currentYear) {
             $nomorRumah = '-';
             $tanggalMasuk = null;
@@ -127,20 +124,17 @@ class PemasukanService
             ];
         });
 
-        // Kembalikan objek Paginator
         return $penghunis;
     }
 
     public function storePemasukan(array $data)
     {
-        // Ambil tarif dari input frontend, jika kosong gunakan default
+       
         $tarifKebersihan = $data['tarifKebersihan'] ?? 35000;
         $tarifSatpam = $data['tarifSatpam'] ?? 80000;
 
-        // Kalkulasi total berdasarkan tarif yang mungkin sudah diedit
         $total = ($data['bulanKebersihan'] * $tarifKebersihan) + ($data['bulanSatpam'] * $tarifSatpam);
 
-        // Cari tahu warga ini sekarang tinggal di rumah mana
         $penghuni = Penghuni::with('currentRumah')->find($data['penghuniId']);
         $rumahId = $penghuni->currentRumah->id ?? null;
 

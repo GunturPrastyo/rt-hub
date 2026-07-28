@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('histori_penghuni', function (Blueprint $table) {
             $table->id();
-            // Perbaikan 'Rumah' menjadi 'rumah' dan 'Penghuni' menjadi 'penghuni'
+
             $table->foreignId('rumah_id')->constrained('rumah')->cascadeOnDelete();
             $table->foreignId('penghuni_id')->constrained('penghuni')->cascadeOnDelete();
 

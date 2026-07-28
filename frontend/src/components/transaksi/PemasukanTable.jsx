@@ -15,12 +15,10 @@ export default function PemasukanTable({ onTransactionSuccess }) {
   const [statusIuranWarga, setStatusIuranWarga] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Pagination & Refresh State
   const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Reset ke halaman 1 jika user mengetik pencarian
   useEffect(() => {
     setCurrentPage(1);
   }, [searchWargaQuery]);
@@ -52,7 +50,7 @@ export default function PemasukanTable({ onTransactionSuccess }) {
     try {
       await api.post('/iuran', data);
       setIsBayarModalOpen(false);
-      setRefreshTrigger(prev => prev + 1); // Trigger refresh otomatis
+      setRefreshTrigger(prev => prev + 1); 
       if (onTransactionSuccess) onTransactionSuccess();
     } catch (error) {
       console.error(error);

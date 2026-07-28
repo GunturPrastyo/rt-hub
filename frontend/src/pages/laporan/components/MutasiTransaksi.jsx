@@ -7,7 +7,7 @@ export default function MutasiTransaksi({
   mutasi,
   periodeOptions,
   selectedPeriode,
-  selectedYear, // Menerima parameter tahun dari parent
+  selectedYear, 
   onPeriodeChange,
   pagination, 
   onPageChange, 
@@ -16,7 +16,6 @@ export default function MutasiTransaksi({
 }) {
   const [isExporting, setIsExporting] = useState(false);
 
-  // Fungsi untuk hit API dan mendownload CSV
   const handleExportCSV = async () => {
     if (!selectedPeriode) return;
     
@@ -24,10 +23,9 @@ export default function MutasiTransaksi({
     try {
       const response = await api.get('/laporan/export', {
         params: { year: selectedYear, periode: selectedPeriode },
-        responseType: 'blob', // Penting untuk download file
+        responseType: 'blob', 
       });
 
-      // Bikin URL object dari blob response
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;

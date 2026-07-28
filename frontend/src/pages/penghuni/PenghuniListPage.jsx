@@ -53,17 +53,16 @@ export default function PenghuniListPage() {
     setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
-  // Reset ke halaman 1 jika kata kunci pencarian atau filter status berubah
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, statusFilter]);
 
-  // Fetch API menggunakan Debounce 
+
   useEffect(() => {
     const fetchPenghuni = async () => {
       try {
         setIsLoading(true);
-        // Kirim Parameter ke Backend
+    
         const response = await api.get('/penghuni', {
           params: { 
             page: currentPage, 
@@ -72,7 +71,6 @@ export default function PenghuniListPage() {
           }
         });
         
-        // Simpan data dan metadata pagination
         setPenghuniList(response.data.data);
         setPagination(response.data.meta || {});
       } catch (error) {
@@ -88,7 +86,7 @@ export default function PenghuniListPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  // Pastikan refreshTrigger masuk ke dalam array dependency!
+
   }, [currentPage, searchQuery, statusFilter, refreshTrigger]); 
 
 
@@ -114,11 +112,10 @@ export default function PenghuniListPage() {
     try {
       await api.delete(`/penghuni/${penghuniToDelete.id}`);
       
-      // Jika data terakhir di halaman dihapus, mundur 1 halaman (kecuali halaman 1)
       if (penghuniList.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       } else {
-        // Trigger refetch di halaman saat ini
+  
         setRefreshTrigger(prev => prev + 1);
       }
       
@@ -159,11 +156,10 @@ export default function PenghuniListPage() {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         showToast('Data penghuni berhasil ditambahkan.', 'success');
-        setCurrentPage(1); // Kembali ke halaman 1 jika nambah data baru
+        setCurrentPage(1); 
       }
       setIsModalOpen(false);
-      
-      // Paksa refresh data tanpa harus menekan F5
+
       setRefreshTrigger(prev => prev + 1); 
       
     } catch (error) {

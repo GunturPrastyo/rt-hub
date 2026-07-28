@@ -13,8 +13,7 @@ import {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Struktur Menu
+  
   const menu = [
     { heading: 'Menu Utama' },
     { name: 'Dashboard', icon: HiOutlineHome, link: '/dashboard' },

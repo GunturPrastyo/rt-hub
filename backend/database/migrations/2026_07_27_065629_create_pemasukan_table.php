@@ -10,10 +10,9 @@ return new class extends Migration
     {
         Schema::create('pemasukan', function (Blueprint $table) {
             $table->id();
-            // Konvensi Laravel menggunakan huruf kecil untuk nama tabel di database
+
             $table->foreignId('penghuni_id')->constrained('penghuni')->cascadeOnDelete();
             
-            // TAMBAHAN: Transaksi harus tahu untuk rumah mana pembayaran ini dilakukan
             $table->foreignId('rumah_id')->constrained('rumah')->cascadeOnDelete(); 
             
             $table->integer('bulan_kebersihan')->default(0);

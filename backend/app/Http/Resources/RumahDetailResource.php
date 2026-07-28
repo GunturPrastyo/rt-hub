@@ -9,7 +9,7 @@ class RumahDetailResource extends JsonResource
 {
     public function toArray($request)
     {
-        // Extract data yang dikirim dari service
+
         $rumah = $this->resource['rumah'];
         $pemasukan = $this->resource['pemasukan'];
 
@@ -18,8 +18,7 @@ class RumahDetailResource extends JsonResource
             'nomorRumah' => $rumah->nomor_rumah,
             'status' => $rumah->status,
             'penghuniNama' => $rumah->penghuni->nama ?? 'Tidak Ada (Kosong)',
-            
-            // Format data riwayat penghuni
+        
             'historyPenghuni' => $rumah->historiPenghuni->map(function ($histori) {
                 return [
                     'nama' => $histori->penghuni->nama ?? 'Tidak Diketahui',
@@ -31,7 +30,6 @@ class RumahDetailResource extends JsonResource
                 ];
             }),
 
-            // Format data riwayat pembayaran
             'historyPembayaran' => $pemasukan->map(function ($pay) {
                 return [
                     'status' => 'Lunas', 

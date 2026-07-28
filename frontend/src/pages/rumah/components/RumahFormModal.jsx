@@ -19,7 +19,7 @@ export default function RumahFormModal({
   rumahList = [], 
   isSubmitting 
 }) {
-  // STATE BARU: Hanya bergantung pada ID Penghuni yang dipilih
+
   const [selectedPenghuniId, setSelectedPenghuniId] = useState('kosong');
   
   const [searchPenghuniQuery, setSearchPenghuniQuery] = useState('');
@@ -28,7 +28,6 @@ export default function RumahFormModal({
 
   useEffect(() => {
     if (initialData) {
-      // Jika ada penghuniId, set ID-nya. Jika tidak, set ke 'kosong'
       setSelectedPenghuniId(initialData.penghuniId ? String(initialData.penghuniId) : 'kosong');
     } else {
       setSelectedPenghuniId('kosong');
@@ -68,7 +67,6 @@ export default function RumahFormModal({
     (p) => String(p.id) === String(selectedPenghuniId)
   );
 
-  // LOGIKA STATUS OTOMATIS
   const isDihuni = selectedPenghuniId !== 'kosong';
   const computedStatus = isDihuni ? 'Dihuni' : 'Kosong';
 
@@ -78,7 +76,7 @@ export default function RumahFormModal({
 
     onSubmit({
       nomorRumah: formData.get('nomorRumah'),
-      status: computedStatus, // Mengirim status yang dihitung otomatis
+      status: computedStatus, 
       penghuniId: isDihuni && selectedWargaObj ? selectedWargaObj.id : null,
       penghuniNama: isDihuni && selectedWargaObj ? selectedWargaObj.nama : '-',
       tipePenghuni: isDihuni && selectedWargaObj ? selectedWargaObj.statusWarga : '-',

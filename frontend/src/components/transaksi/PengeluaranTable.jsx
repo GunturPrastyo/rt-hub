@@ -11,7 +11,6 @@ export default function PengeluaranTable({ sisaSaldo, onTransactionSuccess }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Pagination & Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,7 +48,7 @@ export default function PengeluaranTable({ sisaSaldo, onTransactionSuccess }) {
     try {
       await api.post('/pengeluaran', data);
       setIsModalOpen(false);
-      setRefreshTrigger(prev => prev + 1); // Trigger refresh otomatis
+      setRefreshTrigger(prev => prev + 1); 
       if (onTransactionSuccess) onTransactionSuccess(); 
     } catch (error) {
       console.error(error);

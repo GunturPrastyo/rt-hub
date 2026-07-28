@@ -35,17 +35,14 @@ export default function PengeluaranFormModal({ isOpen, onClose, onSubmit, sisaSa
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
 
-  // 2. Tarik data dari API dan gabungkan dengan Default
   const fetchCategories = async () => {
     try {
       const response = await api.get('/kategori-pengeluaran');
-      
-      // Filter data dari DB untuk memastikan tidak ada duplikat nama dengan default
+ 
       const dbCategories = response.data.data.filter(
         dbCat => !DEFAULT_CATEGORIES.some(defCat => defCat.nama.toLowerCase() === dbCat.nama.toLowerCase())
       );
-      
-      // Gabungkan array: Default duluan, baru Custom dari DB
+
       const combinedCategories = [...DEFAULT_CATEGORIES, ...dbCategories];
       
       setCategories(combinedCategories);
@@ -55,7 +52,7 @@ export default function PengeluaranFormModal({ isOpen, onClose, onSubmit, sisaSa
       }
     } catch (error) {
       console.error("Gagal memuat kategori dari API, menggunakan default:", error);
-      setCategories(DEFAULT_CATEGORIES); // Fallback ke default jika API error
+      setCategories(DEFAULT_CATEGORIES); 
       if (!selectedCategory) setSelectedCategory(DEFAULT_CATEGORIES[0].id);
     }
   };
@@ -83,7 +80,6 @@ export default function PengeluaranFormModal({ isOpen, onClose, onSubmit, sisaSa
   }, [dropdownRef]);
 
 
-  // --- LOGIKA KATEGORI ---
   const handleSelectCategory = (id) => {
     if (id === "ADD_NEW") {
       setShowNewCategoryInput(true);
@@ -98,7 +94,6 @@ export default function PengeluaranFormModal({ isOpen, onClose, onSubmit, sisaSa
     const name = newCategoryName.trim();
     if (!name) return alert("Nama kategori baru tidak boleh kosong!");
     
-    // Validasi agar tidak membuat kategori dengan nama yang sama persis dengan default
     const isDuplicateWithDefault = DEFAULT_CATEGORIES.some(c => c.nama.toLowerCase() === name.toLowerCase());
     if (isDuplicateWithDefault) {
        return alert("Kategori ini sudah menjadi bawaan sistem. Silakan pilih dari daftar.");
@@ -160,8 +155,6 @@ export default function PengeluaranFormModal({ isOpen, onClose, onSubmit, sisaSa
     }
   };
 
-
-  // --- LOGIKA TRANSAKSI ---
   const handleNominalChange = (e) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, '');
     setNominal(rawValue);

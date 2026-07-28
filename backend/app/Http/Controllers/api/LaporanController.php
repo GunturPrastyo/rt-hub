@@ -29,11 +29,9 @@ class LaporanController extends Controller
         $page = $request->input('page', 1);
         $perPage = 10; 
         
-        // Tangkap parameter 'year' dari request, jika kosong gunakan tahun ini
         $selectedYear = $request->input('year', Carbon::now()->year);
         $selectedPeriode = $request->input('periode'); 
 
-        // 1. Ambil Opsi Tahun Dinamis dari Database (PERBAIKAN: Menggunakan Model)
         $yearsPemasukan = Pemasukan::whereNotNull('tanggal_bayar')
             ->selectRaw('YEAR(tanggal_bayar) as year')
             ->distinct()
@@ -46,20 +44,17 @@ class LaporanController extends Controller
             ->pluck('year')
             ->toArray();
 
-        // Gabungkan, hapus duplikat, dan urutkan menurun
         $yearOptions = array_unique(array_merge($yearsPemasukan, $yearsPengeluaran));
         rsort($yearOptions);
 
-        // Fallback jika database masih kosong sama sekali
         if (empty($yearOptions)) {
             $yearOptions = [Carbon::now()->year];
         }
 
-        // 2. Grafik Data (Yearly berdasarkan $selectedYear)
         $grafik = [];
         for ($i = 1; $i <= 12; $i++) {
             $monthName = Carbon::create()->month($i)->translatedFormat('M');
-            // Gunakan $selectedYear alih-alih $currentYear
+
             $pemasukanBulanIni = $this->pemasukanService->getTotalPemasukanByMonthYear($i, $selectedYear);
             $pengeluaranBulanIni = $this->pengeluaranService->getTotalPengeluaranByMonthYear($i, $selectedYear);
             
@@ -70,7 +65,6 @@ class LaporanController extends Controller
             ];
         }
 
-        // 3. Mutasi Data (Monthly based on selectedPeriode)
         $allMutasi = [];
         if ($selectedPeriode) {
             try {
@@ -120,7 +114,6 @@ class LaporanController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // 4. Filter Opsi Periode khusus untuk Tahun yang sedang dipilih
         $periodeOptions = $this->getAvailableFinancialPeriods($selectedYear);
 
         return response()->json([
@@ -129,15 +122,13 @@ class LaporanController extends Controller
                 'grafik' => $grafik,
                 'mutasi' => $paginatedMutasi,
                 'periodeOptions' => $periodeOptions,
-                'yearOptions' => $yearOptions, // Kirimkan opsi tahun ke frontend
+                'yearOptions' => $yearOptions, 
             ]
         ]);
     }
 
-    // Ubah fungsi ini agar menerima filter tahun
     private function getAvailableFinancialPeriods($year)
     {
-        // Hanya ambil periode bulan pada tahun yang diminta
         $pemasukanPeriods = Pemasukan::whereYear('tanggal_bayar', $year)
             ->selectRaw('DISTINCT DATE_FORMAT(tanggal_bayar, "%Y-%m") as periode')
             ->get()
@@ -175,31 +166,30 @@ class LaporanController extends Controller
 
                 foreach ($pemasukanMutasi as $p) {
                     $nominal = (int) $p->total;
-                    $totalPemasukanBulanIni += $nominal; // Hitung total pemasukan
+                    $totalPemasukanBulanIni += $nominal; 
                     
                     $allMutasi[] = [
                         'tanggal' => Carbon::parse($p->tanggal_bayar)->format('Y-m-d'),
                         'jenis' => 'Pemasukan',
                         'kategori' => 'Iuran', 
                         'keterangan' => 'Pembayaran Iuran ' . $p->penghuni->nama . ' (' . $p->bulan_kebersihan . ' Kebersihan, ' . $p->bulan_satpam . ' Satpam)',
-                        'nominal' => $nominal, // Nominal positif
+                        'nominal' => $nominal, 
                     ];
                 }
 
                 foreach ($pengeluaranMutasi as $pe) {
                     $nominal = (int) $pe->nominal;
-                    $totalPengeluaranBulanIni += $nominal; // Hitung total pengeluaran
+                    $totalPengeluaranBulanIni += $nominal; 
                     
                     $allMutasi[] = [
                         'tanggal' => Carbon::parse($pe->tanggal)->format('Y-m-d'),
                         'jenis' => 'Pengeluaran',
                         'kategori' => $pe->kategori,
                         'keterangan' => $pe->keterangan,
-                        'nominal' => -$nominal, // Jadikan negatif agar sesuai dengan tabel dan gampang di-Sum Excel
+                        'nominal' => -$nominal, 
                     ];
                 }
 
-                // Urutkan berdasarkan tanggal terbaru
                 usort($allMutasi, function($a, $b) {
                     return strtotime($b['tanggal']) - strtotime($a['tanggal']);
                 });
@@ -208,10 +198,8 @@ class LaporanController extends Controller
             }
         }
 
-        // Ambil Saldo Kas Keseluruhan RT Aktual (Seluruhnya)
         $sisaSaldoKas = $this->pengeluaranService->getSisaSaldo();
 
-        // Buat response CSV
         $fileName = "Laporan_Mutasi_" . str_replace(' ', '_', $selectedPeriode) . ".csv";
         $headers = [
             "Content-type"        => "text/csv; charset=UTF-8",
@@ -221,16 +209,13 @@ class LaporanController extends Controller
             "Expires"             => "0"
         ];
 
-        // Header Kolom (Persis seperti tabel di Frontend)
         $columns = ['Tanggal', 'Jenis', 'Kategori', 'Keterangan', 'Nominal (Rp)'];
 
         $callback = function() use($allMutasi, $columns, $totalPemasukanBulanIni, $totalPengeluaranBulanIni, $sisaSaldoKas) {
             $file = fopen('php://output', 'w');
             
-            // Tambahkan BOM (Byte Order Mark) agar Excel otomatis membaca encoding sebagai UTF-8
             fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
             
-            // Gunakan separator ';' agar otomatis rapi masuk kolom di Excel format region Indonesia
             fputcsv($file, $columns, ';');
 
             foreach ($allMutasi as $item) {
@@ -239,24 +224,19 @@ class LaporanController extends Controller
                     $item['jenis'],
                     $item['kategori'],
                     $item['keterangan'],
-                    $item['nominal'] // Angka raw agar bisa di-Sum otomatis
+                    $item['nominal'] 
                 ], ';');
             }
 
-            // --- TAMBAHAN BARU: SUMMARY TOTAL DI BAWAH CSV ---
-            
-            // Tambahkan Baris Kosong sebagai pemisah
             fputcsv($file, [], ';');
             fputcsv($file, [], ';');
 
-            // Tambahkan Summary Data (Ringkasan Bulan Ini)
             fputcsv($file, ['RINGKASAN PERIODE INI', '', '', '', ''], ';');
             fputcsv($file, ['Total Pemasukan Bulan Ini', '', '', '', $totalPemasukanBulanIni], ';');
             fputcsv($file, ['Total Pengeluaran Bulan Ini', '', '', '', -$totalPengeluaranBulanIni], ';');
             
-            fputcsv($file, [], ';'); // Baris Kosong lagi
+            fputcsv($file, [], ';');
             
-            // Tambahkan Sisa Kas Aktual (Seluruhnya)
             fputcsv($file, ['TOTAL SALDO KAS RT (AKTUAL)', '', '', '', $sisaSaldoKas], ';');
 
             fclose($file);

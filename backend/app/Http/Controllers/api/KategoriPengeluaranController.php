@@ -25,7 +25,7 @@ class KategoriPengeluaranController extends Controller {
     }
 
     public function destroy(KategoriPengeluaran $kategoriPengeluaran) {
-        // Cek apakah kategori ini sudah dipakai di tabel pengeluaran (berdasarkan string nama)
+       
         $isUsed = Pengeluaran::where('kategori', $kategoriPengeluaran->nama)->exists();
         
         if ($isUsed) {

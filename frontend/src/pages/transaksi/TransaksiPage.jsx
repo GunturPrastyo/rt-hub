@@ -33,7 +33,6 @@ export default function TransaksiPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Pindahkan fetchSummary ke luar useEffect agar bisa dikirim ke child component
   const fetchSummary = async () => {
     try {
       setLoading(true);

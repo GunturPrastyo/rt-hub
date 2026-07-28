@@ -24,9 +24,7 @@ export default function AppRouter() {
         {/* Protected Routes (Harus Login) */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<MainLayout />}>
-            {/* Otomatis redirect dari "/" ke "/dashboard" */}
             <Route index element={<Navigate to="/dashboard" replace />} /> 
-            
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="rumah" element={<RumahListPage />} />
             <Route path="penghuni" element={<PenghuniListPage />} />
@@ -35,7 +33,6 @@ export default function AppRouter() {
           </Route>
         </Route>
 
-        {/* Fallback Route: Jika route tidak ditemukan, kembalikan ke login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

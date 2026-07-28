@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\RumahDetailResource;
 use App\Http\Resources\RumahResource;
 use App\Models\Rumah;
 use App\Services\RumahService;
@@ -30,9 +29,6 @@ class RumahController extends Controller
 
         return RumahResource::collection($query->paginate(9));
     }
-
-    // --- TAMBAHAN BARU ---
-    // Timpa fungsi show yang lama, dan tambahkan fungsi history
 
     public function show(Rumah $rumah)
     {
@@ -82,17 +78,16 @@ class RumahController extends Controller
             return [
                 'id' => $pay->id,
                 'status' => 'Lunas', 
-                'bulan' => Carbon::parse($pay->tanggal_bayar)->translatedFormat('d M Y'), // Menampilkan tanggal bayar lebih spesifik
+                'bulan' => Carbon::parse($pay->tanggal_bayar)->translatedFormat('d M Y'), 
                 'penghuniSaatItu' => $pay->penghuni->nama ?? '-',
                 'nominal' => $pay->total,
-                'rincian' => implode(' • ', $rincianArray) // Contoh hasil: "Kebersihan (1 bln) • Satpam (1 bln)"
+                'rincian' => implode(' • ', $rincianArray) 
             ];
         });
 
         return response()->json($paginator);
     }
-    // ----------------------
-
+    
     public function store(Request $request)
     {
         $validated = $request->validate([

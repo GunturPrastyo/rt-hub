@@ -26,25 +26,22 @@ export default function RumahListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
   
-  // State API, Pagination, dan TRIGGER REFRESH
   const [rumahList, setRumahList] = useState([]);
   const [availablePenghuni, setAvailablePenghuni] = useState([]);
   const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Trigger khusus agar re-fetch
+  const [refreshTrigger, setRefreshTrigger] = useState(0); 
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // State Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedRumah, setSelectedRumah] = useState(null);
   const [rumahToDelete, setRumahToDelete] = useState(null);
 
-  // State Toast
   const [toast, setToast] = useState({ message: '', type: 'info', isVisible: false });
 
   const showToast = (message, type = 'info') => {
@@ -63,7 +60,6 @@ export default function RumahListPage() {
     const fetchRumahData = async () => {
       setIsLoading(true);
       try {
-        // Eksekusi API secara paralel (termasuk memanggil status tunggakan iuran)
         const [responseRumah, responsePenghuni, responseIuran] = await Promise.all([
           api.get('/rumah', {
             params: {
@@ -73,13 +69,11 @@ export default function RumahListPage() {
             }
           }),
           api.get('/penghuni'),
-          api.get('/iuran/status') // Memanggil status nunggak dari backend
+          api.get('/iuran/status') 
         ]);
         
         const rawRumahList = responseRumah.data.data;
         const iuranList = responseIuran.data.data || [];
-
-        // Gabungkan (Merge) data Rumah dengan status Iuran berdasarkan Nomor Rumah
         const enrichedRumahList = rawRumahList.map(rumah => {
           const iuranData = iuranList.find(i => i.nomorRumah === rumah.nomorRumah);
           return { ...rumah, iuranInfo: iuranData };
@@ -101,7 +95,7 @@ export default function RumahListPage() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  // Tambahkan refreshTrigger ke dependency agar auto-update saat form disubmit!
+
   }, [currentPage, searchQuery, statusFilter, refreshTrigger]); 
 
 
@@ -137,7 +131,7 @@ export default function RumahListPage() {
       if (rumahList.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       } else {
-        setRefreshTrigger(prev => prev + 1); // Paksa Refresh
+        setRefreshTrigger(prev => prev + 1); 
       }
       showToast('Data rumah berhasil dihapus.', 'success');
     } catch (error) {
@@ -170,7 +164,7 @@ export default function RumahListPage() {
       }
       
       setIsModalOpen(false);
-      setRefreshTrigger(prev => prev + 1); // Paksa refresh data tanpa reload browser!
+      setRefreshTrigger(prev => prev + 1); 
       
     } catch (error) {
       console.error("Gagal menyimpan data rumah:", error);

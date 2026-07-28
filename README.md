@@ -41,6 +41,9 @@ Proyek ini terbagi menjadi dua bagian: `backend` dan `frontend`. Anda harus menj
 5. Jalankan migrasi database (pastikan database kosong sudah dibuat di MySQL):
 `php artisan migrate`
 
+6. Membuat tautan (symbolic link) untuk storage
+`php artisan storage:link`
+
 6. Jalankan server backend:
 `php artisan serve`
 

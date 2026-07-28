@@ -28,7 +28,6 @@ class PengeluaranService
         return $totalPemasukan - $totalPengeluaran;
     }
 
-    // UPDATE: Tambahkan parameter paginate dan pencarian
     public function getAllPengeluaran($perPage = 10, $search = null)
     {
         $query = Pengeluaran::latest();

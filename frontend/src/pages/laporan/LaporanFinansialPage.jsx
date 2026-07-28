@@ -82,8 +82,8 @@ export default function LaporanFinansialPage() {
         grafik={laporan.grafik} 
         formatCurrency={formatCurrency} 
         selectedYear={selectedYear} 
-        yearOptions={laporan.yearOptions} // PROPS BARU
-        onYearChange={setSelectedYear}    // PROPS BARU
+        yearOptions={laporan.yearOptions} 
+        onYearChange={setSelectedYear}    
       />
 
       <MutasiTransaksi
@@ -97,7 +97,7 @@ export default function LaporanFinansialPage() {
         }}
         periodeOptions={laporan.periodeOptions}
         selectedPeriode={selectedPeriode}
-        selectedYear={selectedYear}       // PROPS BARU
+        selectedYear={selectedYear}       
         onPeriodeChange={setSelectedPeriode}
         onPageChange={setCurrentPage}
         loading={loading}
