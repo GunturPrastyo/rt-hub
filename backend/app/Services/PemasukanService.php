@@ -133,7 +133,12 @@ class PemasukanService
 
     public function storePemasukan(array $data)
     {
-        $total = ($data['bulanKebersihan'] * 35000) + ($data['bulanSatpam'] * 80000);
+        // Ambil tarif dari input frontend, jika kosong gunakan default
+        $tarifKebersihan = $data['tarifKebersihan'] ?? 35000;
+        $tarifSatpam = $data['tarifSatpam'] ?? 80000;
+
+        // Kalkulasi total berdasarkan tarif yang mungkin sudah diedit
+        $total = ($data['bulanKebersihan'] * $tarifKebersihan) + ($data['bulanSatpam'] * $tarifSatpam);
 
         // Cari tahu warga ini sekarang tinggal di rumah mana
         $penghuni = Penghuni::with('currentRumah')->find($data['penghuniId']);
@@ -141,7 +146,7 @@ class PemasukanService
 
         return Pemasukan::create([
             'penghuni_id' => $data['penghuniId'],
-            'rumah_id' => $rumahId, // Simpan rumah_id ke database
+            'rumah_id' => $rumahId,
             'bulan_kebersihan' => $data['bulanKebersihan'],
             'bulan_satpam' => $data['bulanSatpam'],
             'total' => $total,

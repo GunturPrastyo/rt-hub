@@ -39,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('kategori-pengeluaran', KategoriPengeluaranController::class)->except(['show']);
     Route::get('/iuran/status', [PemasukanController::class, 'statusIuran']);
     Route::post('/iuran', [PemasukanController::class, 'store']);
+    Route::get('/tarif-master', [PemasukanController::class, 'getTarifMaster']);
+    Route::post('/tarif-master', [PemasukanController::class, 'updateTarifMaster']);
 });
 
 // Laporan Finansial

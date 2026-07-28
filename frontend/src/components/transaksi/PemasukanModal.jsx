@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import api from '../../services/api'; 
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -8,18 +9,21 @@ import {
   HiChevronDown,
   HiOutlineUserCircle,
   HiOutlineHome,
-  HiOutlineIdentification
+  HiOutlineIdentification,
+  HiOutlineCurrencyDollar,
+  HiPencilSquare,
+  HiCheck
 } from 'react-icons/hi2';
 
 export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePenghuni = [], selectedBulan }) {
-  const TARIF_KEBERSIHAN = 35000;
-  const TARIF_SATPAM = 80000;
-
   const [selectedPenghuniId, setSelectedPenghuniId] = useState('');
-  
-  // LOGIKA BARU: State awal diatur sebagai string kosong ('') bukan 0
   const [bulanKebersihan, setBulanKebersihan] = useState('');
   const [bulanSatpam, setBulanSatpam] = useState('');
+
+  // State Tarif Master dari Database
+  const [tarifKebersihan, setTarifKebersihan] = useState(35000);
+  const [tarifSatpam, setTarifSatpam] = useState(80000);
+  const [isEditingTarif, setIsEditingTarif] = useState(false);
 
   // For searchable dropdown
   const [wargaSearchQuery, setWargaSearchQuery] = useState('');
@@ -28,16 +32,26 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
 
   const selectedWarga = availablePenghuni.find((p) => String(p.id) === String(selectedPenghuniId));
 
-  // Reset form when modal opens or closes
+  // Ambil data tarif master terbaru dari Database saat modal dibuka
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      api.get('/tarif-master')
+        .then((response) => {
+          if (response.data.success) {
+            setTarifKebersihan(response.data.tarif_kebersihan);
+            setTarifSatpam(response.data.tarif_satpam);
+          }
+        })
+        .catch((err) => console.error('Gagal memuat tarif master:', err));
+    } else {
       setSelectedPenghuniId('');
       setWargaSearchQuery('');
       setIsWargaDropdownOpen(false);
+      setIsEditingTarif(false);
     }
   }, [isOpen]);
 
-  // LOGIKA BARU: Pengaturan otomatis jumlah bulan saat penghuni dipilih
+  // Pengaturan otomatis jumlah bulan saat penghuni dipilih
   useEffect(() => {
     if (!selectedWarga) {
       setBulanKebersihan('');
@@ -48,7 +62,6 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     const tunggakanKeb = selectedWarga.tunggakan?.kebersihan || 0;
     const tunggakanSat = selectedWarga.tunggakan?.satpam || 0;
 
-    // Jika ada tunggakan, isi angka. Jika tidak ada tunggakan (lunas), biarkan kosong ('')
     setBulanKebersihan(tunggakanKeb > 0 ? tunggakanKeb : '');
     setBulanSatpam(tunggakanSat > 0 ? tunggakanSat : '');
   }, [selectedWarga]);
@@ -77,9 +90,27 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     return w.nama.toLowerCase().includes(query) || w.nomorRumah.toLowerCase().includes(query);
   });
 
-  // LOGIKA BARU: Kalkulasi diubah, menambahkan fallback || 0 jika input kosong
-  const totalKebersihan = (Number(bulanKebersihan) || 0) * TARIF_KEBERSIHAN;
-  const totalSatpam = (Number(bulanSatpam) || 0) * TARIF_SATPAM;
+  // Simpan perubahan tarif master secara permanen ke Database
+  const handleSaveTarifMaster = async () => {
+    try {
+      const response = await api.post('/tarif-master', {
+        tarif_kebersihan: tarifKebersihan,
+        tarif_satpam: tarifSatpam
+      });
+      
+      if (response.data.success) {
+        setIsEditingTarif(false);
+        alert('Tarif master berhasil disimpan secara permanen di database.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Gagal menyimpan tarif master.');
+    }
+  };
+
+  // Kalkulasi total berdasarkan tarif master
+  const totalKebersihan = (Number(bulanKebersihan) || 0) * (Number(tarifKebersihan) || 0);
+  const totalSatpam = (Number(bulanSatpam) || 0) * (Number(tarifSatpam) || 0);
   const grandTotal = totalKebersihan + totalSatpam;
 
   const handleLunasAkhirTahun = (type) => {
@@ -109,6 +140,8 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
       penghuniId: selectedWarga.id,
       bulanKebersihan: Number(bulanKebersihan) || 0,
       bulanSatpam: Number(bulanSatpam) || 0,
+      tarifKebersihan: Number(tarifKebersihan),
+      tarifSatpam: Number(tarifSatpam),
     });
   };
 
@@ -122,7 +155,7 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 p-1">
-          {/* Left Column: Warga Selection & Info */}
+          {/* Left Column: Warga Selection & Master Tarif Pengaturan */}
           <div className="lg:col-span-2 space-y-4">
             <div className="relative" ref={searchRef}>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
@@ -165,6 +198,69 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                     )}
                   </ul>
                 </div>
+              )}
+            </div>
+
+            {/* Kotak Pengaturan Nominal Master Database */}
+            <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                <div className="flex items-center gap-2">
+                  <HiOutlineCurrencyDollar className="w-4 h-4 text-slate-500" />
+                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-xs uppercase tracking-wider">
+                    Tarif Master (Database)
+                  </h3>
+                </div>
+                {!isEditingTarif ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingTarif(true)}
+                    className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+                  >
+                    <HiPencilSquare className="w-3.5 h-3.5" /> Ubah Tarif
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSaveTarifMaster}
+                    className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+                  >
+                    <HiCheck className="w-3.5 h-3.5" /> Simpan Permanen
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                    Kebersihan /bln
+                  </label>
+                  <Input
+                    type="number"
+                    value={tarifKebersihan}
+                    onChange={(e) => setTarifKebersihan(e.target.value === '' ? '' : Number(e.target.value))}
+                    disabled={!isEditingTarif}
+                    min="0"
+                    className={!isEditingTarif ? 'bg-slate-100 dark:bg-slate-900/50 text-slate-500 cursor-not-allowed' : ''}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                    Satpam /bln
+                  </label>
+                  <Input
+                    type="number"
+                    value={tarifSatpam}
+                    onChange={(e) => setTarifSatpam(e.target.value === '' ? '' : Number(e.target.value))}
+                    disabled={!isEditingTarif}
+                    min="0"
+                    className={!isEditingTarif ? 'bg-slate-100 dark:bg-slate-900/50 text-slate-500 cursor-not-allowed' : ''}
+                  />
+                </div>
+              </div>
+              {isEditingTarif && (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 italic">
+                  *Klik "Simpan Permanen" agar perubahan tarif berlaku secara global untuk seluruh pengurus.
+                </p>
               )}
             </div>
 
@@ -213,18 +309,17 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                   <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Kebersihan</h3>
-                      <span className="text-xs text-slate-400">Rp {TARIF_KEBERSIHAN.toLocaleString('id-ID')}/bln</span>
+                      <span className="text-xs text-slate-400">Rp {Number(tarifKebersihan || 0).toLocaleString('id-ID')}/bln</span>
                     </div>
                     {selectedWarga.tunggakan.kebersihan > 0 && (
                       <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
-                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.kebersihan} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.kebersihan} bulan</span>.
                       </div>
                     )}
                     <div>
                       <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
                         Total bulan yang ingin dibayar
                       </label>
-                      {/* LOGIKA BARU: Input onChange memeriksa jika kosong ('') */}
                       <Input
                         type="number"
                         value={bulanKebersihan}
@@ -254,18 +349,17 @@ export default function BayarIuranModal({ isOpen, onClose, onSubmit, availablePe
                   <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200/80 dark:border-slate-600/80 space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Iuran Satpam</h3>
-                      <span className="text-xs text-slate-400">Rp {TARIF_SATPAM.toLocaleString('id-ID')}/bln</span>
+                      <span className="text-xs text-slate-400">Rp {Number(tarifSatpam || 0).toLocaleString('id-ID')}/bln</span>
                     </div>
                     {selectedWarga.tunggakan.satpam > 0 && (
                       <div className="p-2 text-xs text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-md">
-                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.satpam} bulan</span>. Pembayaran akan dihitung dari tunggakan pertama.
+                        Tunggakan: <span className="font-bold">{selectedWarga.tunggakan.satpam} bulan</span>.
                       </div>
                     )}
                     <div>
                       <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">
                         Total bulan yang ingin dibayar
                       </label>
-                      {/* LOGIKA BARU: Input onChange memeriksa jika kosong ('') */}
                       <Input
                         type="number"
                         value={bulanSatpam}
