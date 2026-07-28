@@ -12,9 +12,27 @@ class PenghuniController extends Controller
 {
     public function __construct(protected PenghuniService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return PenghuniResource::collection(Penghuni::with('rumah')->latest()->get());
+        $query = Penghuni::with('rumah')->latest();
+
+        // Filter berdasarkan pencarian nama atau telepon
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('telepon', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter berdasarkan status warga (Tetap/Kontrak)
+        if ($status = $request->query('status')) {
+            if ($status !== 'Semua') {
+                $query->where('status_warga', $status);
+            }
+        }
+
+        // Gunakan paginate() dengan menampilkan 9 data per halaman (pas untuk desain grid 3 kolom)
+        return PenghuniResource::collection($query->paginate(9));
     }
 
     public function store(Request $request)
@@ -28,7 +46,7 @@ class PenghuniController extends Controller
         ]);
 
         $penghuni = $this->service->storePenghuni($validated, $request->file('foto_ktp'));
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Data penghuni berhasil ditambahkan.',
