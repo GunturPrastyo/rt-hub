@@ -13,23 +13,27 @@ Proyek ini terbagi menjadi dua bagian: `backend` dan `frontend`. Anda harus menj
 
 ### Tahap 1: Instalasi Backend (Laravel)
 
-1. Buka command prompt, lalu masuk ke direktori backend:
+1. Jalankan Server Lokal, pastikan Anda sudah membuka Laragon/Xampp/Sejenisnya dan menekan tombol **Start** pada layanan **Apache/Nginx** dan **MySQL**.
+
+2. Buat database, buka phpMyAdmin (biasanya di `http://localhost/phpmyadmin`) atau aplikasi database client lainnya seperti tableplus, lalu buat satu database kosong dengan nama `nama_database_anda`.
+
+3. Buka command prompt, lalu masuk ke direktori backend:
 `cd backend`
 
-2. Instal semua dependensi PHP menggunakan Composer:
+4. Instal semua dependensi PHP menggunakan Composer:
 `composer install`
 
-3. Salin file konfigurasi environment:
+5. Salin file konfigurasi environment:
 `cp .env.example .env`
 
-3. Buka file .env dan sesuaikan konfigurasi database Anda:
+6. Buka file .env dan sesuaikan konfigurasi database Anda:
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=nama_database_rthub
-DB_USERNAME=root
-DB_PASSWORD=
+`DB_CONNECTION=mysql`
+`DB_HOST=127.0.0.1`
+`DB_PORT=3306`
+`DB_DATABASE=nama_database_anda`
+`DB_USERNAME=root`
+`DB_PASSWORD=`
 
 4. Buat Application Key Laravel:
 `php artisan key:generate`
@@ -39,6 +43,7 @@ DB_PASSWORD=
 
 6. Jalankan server backend:
 `php artisan serve`
+
 Backend API sekarang berjalan di http://localhost:8000
 
 ### Tahap 2: Instalasi Frontend (React)
